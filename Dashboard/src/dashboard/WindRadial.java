@@ -1,15 +1,20 @@
 package dashboard;
 
-import eu.hansolo.steelseries.gauges.Radial;
-import java.awt.Component;
-import java.awt.Dimension;
-
 public class WindRadial extends GaugeSetup implements GaugeAttributes {
 
     private String unit;
     private boolean dangerZone = false;
     private PairHeads limits;
     
+    public WindRadial(String name)
+    {
+        super(name, "WindRadial");
+    }
+    
+    public WindRadial()
+    {
+        super();
+    }
     
     @Override
     public String getUnit() {

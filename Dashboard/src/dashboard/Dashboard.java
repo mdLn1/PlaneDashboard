@@ -37,12 +37,14 @@ public final class Dashboard implements FrameSetup {
     public void addComponentsToFrame(Container container)
     {
         JPanel mainPanel = new JPanel(new FlowLayout());
+        
+        WindRadial windGauge = new WindRadial("Wind Direction");
     
         Radial1Square radial1 = new Radial1Square();
         
         mainPanel.add(radial1);
         
-        container.add(mainPanel);
+        container.add(windGauge);
     }
     
     
