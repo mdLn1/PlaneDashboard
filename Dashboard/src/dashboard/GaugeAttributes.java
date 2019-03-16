@@ -13,10 +13,5 @@ public interface GaugeAttributes {
         return "No limits set yet";
     }
     public void setLimits(int start, int finish);
-    public default boolean hasDangerZone()
-    {
-        return false;
-    }
-    public void setDangerZone(int dangerLimit);
     
 }
