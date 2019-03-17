@@ -1,0 +1,24 @@
+private static ContextStorage instance = null;
+
+    private List<SpecialisedGauge> specialisedGauges;
+    private List<RegularGauge> regularGauges;
+
+    private ContextStorage() {
+        specialisedGauges = new ArrayList<>();
+        regularGauges = new ArrayList<>();
+    }
+    
+    public static synchronized ContextStorage getInstance() {
+        if (instance == null) {
+            instance = new ContextStorage();
+        }
+        return instance;
+    }
+
+    public synchronized void addGauge(SpecialisedGauge s) {
+        specialisedGauges.add(s);
+    }
+    
+    public synchronized void addGauge(RegularGauge s) {
+        regularGauges.add(s);
+    }

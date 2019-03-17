@@ -95,5 +95,10 @@ public class GaugeSetup extends JPanel{
     public void setTitle(String title) {
         this.title = title;
     }
+    
+    public AbstractGauge getGauge()
+    {
+        return gauge;
+    }
 
 }

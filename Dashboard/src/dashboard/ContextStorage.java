@@ -1,16 +1,19 @@
 package dashboard;
 
+import java.awt.GridBagConstraints;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class ContextStorage {
     
     private static ContextStorage instance = null;
 
-    private List<String> messages;
+    private HashMap<GaugeSetup,GridBagConstraints> gauges;
 
     private ContextStorage() {
-        messages = new ArrayList<>();
+        gauges = new HashMap<>();
     }
     
     public static synchronized ContextStorage getInstance() {
@@ -20,11 +23,18 @@ public class ContextStorage {
         return instance;
     }
 
-    public synchronized void addMessage(String s) {
-        messages.add(s);
+    public synchronized void addGauge(GaugeSetup s, GridBagConstraints c) {
+        gauges.put(s,c);
     }
-    @Override
-    public String toString() {
-        return messages.toString();
+    
+    public HashMap<GaugeSetup,GridBagConstraints> getGauges()
+    {
+        return gauges;
     }
+    
+    public GridBagConstraints getConstraints(GaugeSetup gg)
+    {
+        return gauges.get(gg);
+    }
+    
 }
