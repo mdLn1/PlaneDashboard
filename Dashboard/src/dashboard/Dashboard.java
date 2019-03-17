@@ -10,7 +10,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -25,8 +24,17 @@ public final class Dashboard implements FrameSetup {
     Container centerContainer;
     JLabel selectedGaugeLabel;
     
+    RegularGauge windDir;
     
-    public Dashboard(){
+    JLabel unitLabel;
+    JButton unitButton;
+    JTextField unitTextField;
+    
+    JLabel titleLabel;
+    JButton titleButton;
+    JTextField titleTextField;
+
+    public Dashboard() {
         createGUI();
     }
 
@@ -37,9 +45,9 @@ public final class Dashboard implements FrameSetup {
         mainFrame.setSize(2000, 1000);
         mainFrame.setPreferredSize(mainFrame.getSize());
         mainFrame.setLayout(new BorderLayout());
-        
+
         context = ContextStorage.getInstance();
-        
+
         addComponentsToFrame(mainFrame.getContentPane());
 
         mainFrame.pack();
@@ -49,80 +57,117 @@ public final class Dashboard implements FrameSetup {
     @Override
     public void addComponentsToMainContainer(Container container) {
 
-        RegularGauge windDir = new RegularGauge("Wind Direction", Helpers.DIRECTION_DIAL);
+        windDir = new RegularGauge("Wind Direction", Helpers.DIRECTION_DIAL);
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.NONE;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0.8;
-        c.weighty = 0.8;
-        //windDir.getGauge().addMouseListener(new GaugesListener(selectedGaugeLabel));
-        
-        context.addGauge(windDir, c);
+        c.weightx = 0.5;
+        c.weighty = 0.5;
+//        c.gridx = 0;
+//        c.gridy = 0;
+//        container.add(windDir, c);
+        context.addGauge(windDir, new PairHeads(0, 0));
 
         RegularGauge halfdial = new RegularGauge("Air Pressure", Helpers.HALF_DIAL);
-        c.fill = GridBagConstraints.NONE;
-        c.gridx = 1;
-        c.gridy = 0;
-        
-        context.addGauge(halfdial, c);
+//        c.gridx = 1;
+//        c.gridy = 0;
+//        container.add(halfdial, c);
+        context.addGauge(halfdial, new PairHeads(1, 0));
+
+        SpecialisedGauge radial = new SpecialisedGauge("Speed", Helpers.SIMPLER_RADIAL);
+//        c.gridx = 2;
+//        c.gridy = 0;
+//        container.add(radial, c);
+        context.addGauge(radial, new PairHeads(2, 0));
+
+        SpecialisedGauge temperature = new SpecialisedGauge("Temperature", Helpers.LINEAR_BAR);
+//        c.gridx = 0;
+//        c.gridy = 1;
+//        container.add(temperature, c);
+        context.addGauge(temperature, new PairHeads(0, 1));
+
+        RegularGauge quarterDial = new RegularGauge("Fuel", Helpers.QUARTER_DIAL);
+//        c.gridx = 1;
+//        c.gridy = 1;
+//        container.add(quarterDial, c);
+        context.addGauge(quarterDial, new PairHeads(1, 1));
 
         TrafficLight trafficLight = new TrafficLight();
         trafficLight.setPreferredSize(new Dimension(300, 300));
         c.gridx = 2;
-        c.gridy = 0;
-        c.weightx = 0.5;
-        c.weighty = 0.5;
-        //container.add(trafficLight, c);
+        c.gridy = 1;
 
-        SpecialisedGauge temperature = new SpecialisedGauge("Temperature", Helpers.LINEAR_BAR);
-        c.gridx = 0;
-        c.gridy = 1;
-        
-        context.addGauge(temperature, c);
-        
-        SpecialisedGauge radial = new SpecialisedGauge("Speed", Helpers.SIMPLER_RADIAL);
-        c.gridx = 2;
-        c.gridy = 1;
-        
-        context.addGauge(radial, c);
-        
-        RegularGauge quarterDial = new RegularGauge("Fuel", Helpers.QUARTER_DIAL);
-        c.fill = GridBagConstraints.NONE;
-        c.gridx = 1;
-        c.gridy = 1;
-        
-        context.addGauge(quarterDial, c);
-        
-        for(Map.Entry<GaugeSetup, GridBagConstraints> g: context.getGauges().entrySet())
-        {
+        container.add(trafficLight, c);
+
+        for (Map.Entry<GaugeSetup, PairHeads> g : context.getGauges().entrySet()) {
             g.getKey().getGauge().addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent evt) {
-                selectedGaugeLabel.setText(g.getKey().getTitle());
-                System.out.println("Got clicked");
-            }
-            
-        });
-            c = g.getValue();
+                @Override
+                public void mouseClicked(MouseEvent evt) {
+                    if (g.getKey() instanceof SpecialisedGauge) {
+                        selectedGaugeLabel.setText("SpecialisedGauge");
+                        adjustRightContainer(g.getKey());
+                        
+                    } else if (g.getKey() instanceof RegularGauge) {
+                        selectedGaugeLabel.setText("RegularGauge");
+                    } else {
+                        System.out.println("Got clicked");
+                    }
+
+                }
+
+            });
+            PairHeads positions = context.getConstraints(g.getKey().getTitle());
+            c.gridx = positions.getStart();
+            c.gridy = positions.getEnd();
+            container.add(g.getKey(), c);
+
         }
-        
-        container.add(windDir, context.getConstraints(windDir));
-        container.add(halfdial, context.getConstraints(halfdial));
-        container.add(temperature, context.getConstraints(temperature));
-        container.add(radial, context.getConstraints(radial));
-        container.add(quarterDial, context.getConstraints(quarterDial));
 
     }
-   
+    
+    public void adjustRightContainer(GaugeSetup gauge)
+    {
+        createRegularFormInput(gauge);
+    }
+    
+    public void createRegularFormInput(GaugeSetup gauge)
+    {
+        String selected = selectedGaugeLabel.getText();
+        JPanel boxedPanel = new JPanel();
+        boxedPanel.setLayout(new GridBagLayout());
+        //boxedPanel.setPreferredSize(new Dimension(250,400));
+        boxedPanel.setAlignmentX(Component.TOP_ALIGNMENT);
+        GridBagConstraints c = new GridBagConstraints();
+
+        titleLabel = Helpers.createLabel("Set title for " + selected);
+        titleLabel.setPreferredSize(new Dimension(240, 40));
+        c = Helpers.addConstraints(0, 0,1.0,0.8);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        boxedPanel.add(titleLabel, c);
+
+        JTextField titleTextField = Helpers.createTextField("");
+        c = Helpers.addConstraints(0, 1);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        boxedPanel.add(titleTextField, c);
+
+        JButton saveDetailsGauge = Helpers.createButton("Save title");
+        
+        c = Helpers.addConstraints(0, 2);
+        c.fill = GridBagConstraints.NONE;
+        boxedPanel.add(saveDetailsGauge, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.PAGE_START;
+        rightContainer.add(boxedPanel, c);
+    }
 
     @Override
     public void addComponentsToFrame(Container container) {
         //edit container on the right
         rightContainer = new Container();
-        addComponentToRightContainer(rightContainer);
         rightContainer.setLayout(new GridBagLayout());
-
+        addComponentToRightContainer(rightContainer);
+        
         centerContainer = new Container();
         centerContainer.setLayout(new GridBagLayout());
         addComponentsToMainContainer(centerContainer);
@@ -130,43 +175,43 @@ public final class Dashboard implements FrameSetup {
         container.add(rightContainer, BorderLayout.EAST);
 
     }
-    
+
     @Override
     public void addComponentToRightContainer(Container container) {
         JPanel boxedPanel = new JPanel();
         boxedPanel.setLayout(new GridBagLayout());
         //boxedPanel.setPreferredSize(new Dimension(250,400));
-        
+        boxedPanel.setAlignmentX(Component.TOP_ALIGNMENT);
         GridBagConstraints c = new GridBagConstraints();
-        
+
         selectedGaugeLabel = Helpers.createLabel("Selected Gauge");
-        selectedGaugeLabel.setPreferredSize(new Dimension(240,40));
+        selectedGaugeLabel.setPreferredSize(new Dimension(240, 40));
+        c = Helpers.addConstraints(0, 0,1.0,0.8);
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 1.0;
-        c.weighty = 0.8;
-        boxedPanel.add(selectedGaugeLabel,c);
-        
+        boxedPanel.add(selectedGaugeLabel, c);
+
         JTextField selectedGaugeText = Helpers.createTextField("");
+        c = Helpers.addConstraints(0, 1);
         c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 1;
-        boxedPanel.add(selectedGaugeText,c);
-        
+        boxedPanel.add(selectedGaugeText, c);
+
         JButton saveDetailsGauge = Helpers.createButton("Save");
-        c.fill = GridBagConstraints.NONE;
+        
         c.gridx = 0;
         c.gridy = 2;
-        boxedPanel.add(saveDetailsGauge,c);
-        
+        c.fill = GridBagConstraints.NONE;
+        boxedPanel.add(saveDetailsGauge, c);
+
         c.gridx = 0;
         c.gridy = 0;
-        container.add(boxedPanel,c);
-        
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.anchor = GridBagConstraints.PAGE_START;
+        container.add(boxedPanel, c);
+
     }
-
-
+    
+    
+   
     public static void main(String[] args) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -189,6 +234,4 @@ public final class Dashboard implements FrameSetup {
         });
     }
 
-
-   
 }

@@ -3,6 +3,7 @@ package dashboard;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -36,7 +37,7 @@ public final class Helpers {
     public static JTextField createTextField(String name) {
         JTextField textField = new JTextField("");
         textField.setAlignmentX(Component.CENTER_ALIGNMENT);
-        textField.setColumns(2);
+        textField.setColumns(4);
         
         return textField;
     }
@@ -48,5 +49,28 @@ public final class Helpers {
         separator.setAlignmentX(Component.CENTER_ALIGNMENT);
         return separator;
     }
+     
+      public static GridBagConstraints addConstraints(int x, int y, double x1, double y1)
+    {
+        GridBagConstraints c1 = new GridBagConstraints();
+        c1.gridx = x;
+        c1.gridy = y;
+        c1.weightx = x1;
+        c1.weighty = y1;
+        
+        return c1;
+    }
+    
+    public static GridBagConstraints addConstraints(int x, int y)
+    {
+        GridBagConstraints c1 = new GridBagConstraints();
+        c1.gridx = x;
+        c1.gridy = y;
+        c1.weightx = 1.0;
+        c1.weighty = 1.0;
+        
+        return c1;
+    }
+    
     
 }
