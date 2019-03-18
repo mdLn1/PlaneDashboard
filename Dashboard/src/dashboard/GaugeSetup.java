@@ -56,7 +56,7 @@ public class GaugeSetup extends JPanel{
         {
             gauge.setPreferredSize(new Dimension(350,350));
         }
-        setGaugeTitle(title);
+        setGaugeTitle(name);
         setGaugeUnit("unit");
         add(gaugeName);
         add(gauge);
@@ -74,7 +74,7 @@ public class GaugeSetup extends JPanel{
         
         gauge = GaugeFactory.createRadialGauge("");
         gauge.setPreferredSize(new Dimension(350,350));
-        setGaugeTitle(title);
+        setGaugeTitle("Default");
         
         add(gaugeName);
         add(gauge);

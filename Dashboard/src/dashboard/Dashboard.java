@@ -11,6 +11,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,8 +24,16 @@ public final class Dashboard implements FrameSetup {
     Container rightContainer;
     Container centerContainer;
     JLabel selectedGaugeLabel;
+   
     
     RegularGauge windDir;
+    JPanel editPanel;
+    
+    JLabel dangerLabel;
+    JTextField dangerMinText;
+    JTextField dangerMaxText;
+    JLabel dangerMinLabel;
+    JLabel dangerMaxLabel;
     
     JLabel unitLabel;
     JButton unitButton;
@@ -38,6 +47,7 @@ public final class Dashboard implements FrameSetup {
         createGUI();
     }
 
+    //method that designs mainFrame
     @Override
     public void createGUI() {
         mainFrame = new JFrame("Plane Dashboard");
@@ -54,6 +64,7 @@ public final class Dashboard implements FrameSetup {
         mainFrame.setVisible(true);
     }
 
+    //design main container for frame
     @Override
     public void addComponentsToMainContainer(Container container) {
 
@@ -97,16 +108,19 @@ public final class Dashboard implements FrameSetup {
 
         container.add(trafficLight, c);
 
-        for (Map.Entry<GaugeSetup, PairHeads> g : context.getGauges().entrySet()) {
-            g.getKey().getGauge().addMouseListener(new MouseAdapter() {
+        //add mouse listener for every gauge + add every gauge to the main container
+        for (Map.Entry<Object, PairHeads> g : context.getGauges().entrySet()) {
+            GaugeSetup tempGauge = (GaugeSetup) g.getKey(); 
+            tempGauge.getGauge().addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent evt) {
                     if (g.getKey() instanceof SpecialisedGauge) {
-                        selectedGaugeLabel.setText("SpecialisedGauge");
-                        adjustRightContainer(g.getKey());
+                        selectedGaugeLabel.setText(tempGauge.getTitle());
+                        adjustRightContainer((SpecialisedGauge) g.getKey());
                         
                     } else if (g.getKey() instanceof RegularGauge) {
-                        selectedGaugeLabel.setText("RegularGauge");
+                        selectedGaugeLabel.setText(tempGauge.getTitle());
+                        adjustRightContainer((RegularGauge) g.getKey());
                     } else {
                         System.out.println("Got clicked");
                     }
@@ -114,51 +128,94 @@ public final class Dashboard implements FrameSetup {
                 }
 
             });
-            PairHeads positions = context.getConstraints(g.getKey().getTitle());
+            PairHeads positions = context.getConstraints(tempGauge.getTitle());
             c.gridx = positions.getStart();
             c.gridy = positions.getEnd();
-            container.add(g.getKey(), c);
+            container.add(tempGauge, c);
 
         }
 
     }
     
-    public void adjustRightContainer(GaugeSetup gauge)
+    //adjust the right container in the frame
+    public void adjustRightContainer(Object gauge)
     {
-        createRegularFormInput(gauge);
+        editPanel = new JPanel();
+        editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
+        //boxedPanel.setPreferredSize(new Dimension(250,400));
+        editPanel.setAlignmentX(Component.TOP_ALIGNMENT);
+        if (gauge instanceof SpecialisedGauge)
+        {   
+            
+            createRegularFormInput((RegularGauge) gauge, editPanel);
+        }else if (gauge instanceof RegularGauge)
+        {
+            createRegularFormInput((RegularGauge) gauge, editPanel);
+        }
+        
     }
     
-    public void createRegularFormInput(GaugeSetup gauge)
+    //create an input form for editing gauges
+    public void createRegularFormInput(RegularGauge gauge, Container container)
     {
         String selected = selectedGaugeLabel.getText();
-        JPanel boxedPanel = new JPanel();
-        boxedPanel.setLayout(new GridBagLayout());
-        //boxedPanel.setPreferredSize(new Dimension(250,400));
-        boxedPanel.setAlignmentX(Component.TOP_ALIGNMENT);
         GridBagConstraints c = new GridBagConstraints();
-
-        titleLabel = Helpers.createLabel("Set title for " + selected);
-        titleLabel.setPreferredSize(new Dimension(240, 40));
-        c = Helpers.addConstraints(0, 0,1.0,0.8);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        boxedPanel.add(titleLabel, c);
-
-        JTextField titleTextField = Helpers.createTextField("");
-        c = Helpers.addConstraints(0, 1);
-        c.fill = GridBagConstraints.HORIZONTAL;
-        boxedPanel.add(titleTextField, c);
-
-        JButton saveDetailsGauge = Helpers.createButton("Save title");
         
-        c = Helpers.addConstraints(0, 2);
-        c.fill = GridBagConstraints.NONE;
-        boxedPanel.add(saveDetailsGauge, c);
+        // <editor-fold desc="setting up title components to edit">
+        titleLabel = Helpers.createLabel("Set title for " + gauge.getTitle());
+        titleLabel.setText("Set title for " + gauge.getTitle());
+        titleLabel.setPreferredSize(new Dimension(280, 40));
+//        c = Helpers.addConstraints(0, 0,1.0,0.8);
+//        c.fill = GridBagConstraints.HORIZONTAL;
+//        container.add(titleLabel, c);
+        container.add(titleLabel);
 
+        titleTextField = Helpers.createTextField(gauge.getTitle());
+//        c = Helpers.addConstraints(0, 1);
+//        c.fill = GridBagConstraints.HORIZONTAL;
+//        container.add(titleTextField, c);
+        container.add(titleTextField);
+
+        titleButton = Helpers.createButton("Save title");
+//        c = Helpers.addConstraints(0, 2);
+//        c.fill = GridBagConstraints.NONE;
+//        container.add(titleButton, c);
+        container.add(titleButton);
+        // </editor-fold>
+        
+        // <editor-fold desc="setting up unit of the components for editing">
+        unitLabel = Helpers.createLabel("Set unit for " + gauge.getTitle());
+        unitLabel.setPreferredSize(new Dimension(280, 40));
+//        c = Helpers.addConstraints(0, 3,1.0,0.8);
+//        c.fill = GridBagConstraints.HORIZONTAL;
+//        container.add(titleLabel, c);
+        container.add(unitLabel);
+
+        unitTextField = Helpers.createTextField(gauge.getUnit());
+//        c = Helpers.addConstraints(0, 4);
+//        c.fill = GridBagConstraints.HORIZONTAL;
+//        container.add(titleTextField, c);
+        container.add(unitTextField);
+
+        unitButton = Helpers.createButton("Save unit");
+//        c = Helpers.addConstraints(0, 5);
+//        c.fill = GridBagConstraints.NONE;
+//        container.add(titleButton, c);
+        container.add(unitButton);
+
+        // </editor-fold>
+        
+        
+        
+        
         c.gridx = 0;
         c.gridy = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
-        rightContainer.add(boxedPanel, c);
+        
+        rightContainer.revalidate();
+        rightContainer.repaint();
+        rightContainer.add(container, c);
     }
 
     @Override

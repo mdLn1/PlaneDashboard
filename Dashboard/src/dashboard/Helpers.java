@@ -35,7 +35,7 @@ public final class Helpers {
     }
 
     public static JTextField createTextField(String name) {
-        JTextField textField = new JTextField("");
+        JTextField textField = new JTextField(name);
         textField.setAlignmentX(Component.CENTER_ALIGNMENT);
         textField.setColumns(4);
         

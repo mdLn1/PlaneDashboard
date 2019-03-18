@@ -8,6 +8,7 @@ public class RegularGauge extends GaugeSetup implements GaugeAttributes {
     public RegularGauge(String name, String type)
     {
         super(name, type);
+        setUnit("unit");
     }
     
     public RegularGauge()

@@ -9,14 +9,10 @@ public class ContextStorage {
     
     private static ContextStorage instance = null;
 
-    private HashMap<GaugeSetup,PairHeads> gauges;
-    private List<SpecialisedGauge> specialisedGauges;
-    private List<RegularGauge> regularGauges;
+    private HashMap<Object,PairHeads> gauges;
 
     private ContextStorage() {
         gauges = new HashMap<>();
-        specialisedGauges = new ArrayList<>();
-        regularGauges = new ArrayList<>();
     }
     
     public static synchronized ContextStorage getInstance() {
@@ -26,58 +22,46 @@ public class ContextStorage {
         return instance;
     }
 
-    public synchronized void addGauge(GaugeSetup s, PairHeads c) {
+    public synchronized void addGauge(Object s, PairHeads c) {
         gauges.put(s,c);
     }
     
-    public HashMap<GaugeSetup,PairHeads> getGauges()
+    public HashMap<Object,PairHeads> getGauges()
     {
         return gauges;
     }
     
-    public PairHeads getConstraints(String gg)
-    {
-        for(GaugeSetup gs: gauges.keySet())
-        {
-            if (gs.getTitle().equals(gg))
-            {
-                return gauges.get(gs);
+    public PairHeads getConstraints(String gg) {
+        for (Object gs : gauges.keySet()) {
+            if (gs instanceof GaugeSetup) {
+                GaugeSetup gauge = (GaugeSetup) gs;
+                if (gauge.getTitle().equals(gg)) {
+                    return gauges.get(gs);
+                }
             }
         }
-        return new PairHeads(0,0);
+        return new PairHeads(0, 0);
     }
+
     
-    public void addSpecialisedGauge(SpecialisedGauge s)
+    public Object getGauge(String title)
     {
-        specialisedGauges.add(s);
-    }
-    
-    public void addRegularGauge(RegularGauge s)
-    {
-        regularGauges.add(s);
-    }
-    
-    public SpecialisedGauge getSpecialisedGauge(String title)
-    {
-        for (SpecialisedGauge s: specialisedGauges)
+        for (Object s: gauges.keySet())
         {
-            if (s.getTitle().equals(title))
-            {
-                return s;
+            if (s instanceof SpecialisedGauge) {
+                SpecialisedGauge sg = (SpecialisedGauge) s;
+
+                if (sg.getTitle().equals(title)) {
+                    return s;
+                }
+            } else if (s instanceof RegularGauge) {
+                RegularGauge rg = (RegularGauge) s;
+
+                if (rg.getTitle().equals(title)) {
+                    return s;
+                }
             }
-        }
-        
-        return null;
-    }
-    
-    public RegularGauge getRegularGauge(String title)
-    {
-        for (RegularGauge s: regularGauges)
-        {
-            if (s.getTitle().equals(title))
-            {
-                return s;
-            }
+            
         }
         
         return null;
