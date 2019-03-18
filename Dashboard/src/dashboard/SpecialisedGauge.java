@@ -1,11 +1,14 @@
 
 package dashboard;
 
+import eu.hansolo.steelseries.tools.Section;
+import java.awt.Color;
+
 public final class SpecialisedGauge extends RegularGauge {
     
     private boolean dangerZone = false;
-    private int dangerZoneMin;
-    private int dangerZoneMax;
+    private double dangerZoneMin = 0.0;
+    private double dangerZoneMax = 0.0;
 
     public SpecialisedGauge(String name, String type) {
         super(name, type);
@@ -22,20 +25,27 @@ public final class SpecialisedGauge extends RegularGauge {
         dangerZone = value;
     }
     
-    public int getDangerZoneMin() {
+    public double getDangerZoneMin() {
         return dangerZoneMin;
     }
     
-    public int getDangerZoneMax() {
+    public double getDangerZoneMax() {
         return dangerZoneMax;
     }
 
-    public void setDangerZoneMin(int min) {
+    public void setDangerZoneMin(double min) {
         dangerZoneMin = min;
+        getGauge().setTrackStart(dangerZoneMax);
+        
     }
-     public void setDangerZoneMax(int max) {
+     public void setDangerZoneMax(double max) {
         dangerZoneMax = max;
+        getGauge().setTrackStop(dangerZoneMax);
+        
     }
     
+    public void setDangerZoneRange(double min, double max) {
+        getGauge().addSection(new Section(min,max, Color.GREEN));
+    }
     
 }

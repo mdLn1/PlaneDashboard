@@ -1,6 +1,7 @@
 package dashboard;
 
 import eu.hansolo.steelseries.extras.TrafficLight;
+import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -13,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
+import javafx.animation.AnimationTimer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,36 +25,38 @@ public final class Dashboard implements FrameSetup {
 
     ContextStorage context;
     
+    private AnimationTimer timer;
     
-    JFrame mainFrame;
-    Container rightContainer;
-    Container centerContainer;
+    private JFrame mainFrame;
+    private Container rightContainer;
+    private Container centerContainer;
     
     // <editor-fold desc="rightContainer JComponents">
-    JLabel selectedGaugeLabel;
-    JTextField selectedGaugeValueText;
+    private JLabel selectedGaugeLabel;
+    private JTextField selectedGaugeValueText;
     
     
     // <editor-fold desc="dynamically generated panel for gauge details editing">
     
     // <editor-fold desc="specialised gauge JComponents">
-    JLabel dangerLabel;
-    JTextField dangerMinText;
-    JTextField dangerMaxText;
-    JLabel dangerMinLabel;
-    JLabel dangerMaxLabel;
-    JButton dangerMinButton;
-    JButton dangerMaxButton;
+    private JLabel dangerLabel;
+    private JTextField dangerMinText;
+    private JTextField dangerMaxText;
+    private JLabel dangerMinLabel;
+    private JLabel dangerMaxLabel;
+    private JButton dangerMinButton;
+    private JButton dangerMaxButton;
+    private JButton dangerRangeButton;
     // </editor-fold>
     
-    JPanel editPanel;
-    JLabel unitLabel;
-    JButton unitButton;
-    JTextField unitTextField;
+    private JPanel editPanel;
+    private JLabel unitLabel;
+    private JButton unitButton;
+    private JTextField unitTextField;
     
-    JLabel titleLabel;
-    JButton titleButton;
-    JTextField titleTextField;
+    private JLabel titleLabel;
+    private JButton titleButton;
+    private JTextField titleTextField;
     // </editor-fold>
     
     // </editor-fold>
@@ -163,7 +167,8 @@ public final class Dashboard implements FrameSetup {
             // <editor-fold desc="additional components for a specialised gauge">
             editPanel.add(Helpers.createSeparatorYaxis());
             
-            dangerMinLabel = Helpers.createSmallLabel("Danger min limit for " + specialGauge.getTitle());
+            dangerMinLabel = Helpers.createSmallLabel("Danger min limit for "
+                    + specialGauge.getTitle());
             dangerMinLabel.setPreferredSize(new Dimension(280, 40));
             editPanel.add(dangerMinLabel);
             
@@ -171,9 +176,19 @@ public final class Dashboard implements FrameSetup {
             editPanel.add(dangerMinText);
             
             dangerMinButton = Helpers.createButton("Save minimum");
+            dangerMinButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SpecialisedGauge gauge = (SpecialisedGauge) context
+                            .getGauge(selectedGaugeLabel.getText().trim());
+                    gauge.setDangerZoneMin(Double.parseDouble(dangerMinText.getText()));
+                }
+
+            });
             editPanel.add(dangerMinButton);
             
-            dangerMaxLabel = Helpers.createSmallLabel("Danger max limit for " + specialGauge.getTitle());
+            dangerMaxLabel = Helpers.createSmallLabel("Danger max limit for "
+                    + specialGauge.getTitle());
             dangerMaxLabel.setPreferredSize(new Dimension(280, 40));
             editPanel.add(dangerMaxLabel);
             
@@ -181,7 +196,44 @@ public final class Dashboard implements FrameSetup {
             editPanel.add(dangerMaxText);
             
             dangerMaxButton = Helpers.createButton("Save maximum");
+            dangerMaxButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SpecialisedGauge gauge = (SpecialisedGauge) context
+                            .getGauge(selectedGaugeLabel.getText().trim());
+                    gauge.setDangerZoneMin(Double.parseDouble(dangerMaxText.getText()));
+                    centerContainer.remove(gauge);
+                    gauge.getGauge().revalidate();
+                    gauge.getGauge().repaint();
+                    
+                    centerContainer.revalidate();
+                    centerContainer.repaint();
+                    gauge.revalidate();
+                    gauge.repaint();
+                    
+                    GridBagConstraints c = new GridBagConstraints();
+                    c.gridx = context.getConstraints(gauge.getTitle()).getStart();
+                    c.gridy = context.getConstraints(gauge.getTitle()).getEnd();
+                    centerContainer.add(gauge,c);
+                    
+                }
+
+            });
             editPanel.add(dangerMaxButton);
+            
+            dangerRangeButton = Helpers.createButton("Save both");
+            dangerRangeButton.setToolTipText("Works differently as the color"
+                    + " changes when the interval is reached");
+            dangerRangeButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    SpecialisedGauge gauge = (SpecialisedGauge) context
+                            .getGauge(selectedGaugeLabel.getText().trim());
+                    gauge.setDangerZoneRange(Double.parseDouble(dangerMinText.getText()),
+                            Double.parseDouble(dangerMaxText.getText()));
+                }
+
+            });
             // </editor-fold>
             
             createRegularFormInput((RegularGauge) gauge, editPanel);
@@ -207,6 +259,15 @@ public final class Dashboard implements FrameSetup {
         container.add(titleTextField);
 
         titleButton = Helpers.createButton("Save title");
+        titleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                GaugeSetup gauge = (GaugeSetup) context
+                        .getGauge(selectedGaugeLabel.getText().trim());
+                gauge.setTitle(titleTextField.getText());
+            }
+            
+        });
         container.add(titleButton);
         // </editor-fold>
         
@@ -219,6 +280,15 @@ public final class Dashboard implements FrameSetup {
         container.add(unitTextField);
 
         unitButton = Helpers.createButton("Save unit");
+        unitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegularGauge gauge = (RegularGauge) context
+                        .getGauge(selectedGaugeLabel.getText().trim());
+                gauge.getGauge().setUnitString(unitTextField.getText());
+            }
+            
+        });
         container.add(unitButton);
 
         // </editor-fold>
@@ -271,8 +341,13 @@ public final class Dashboard implements FrameSetup {
             @Override
             public void actionPerformed(ActionEvent e) {
                 double newValue = Double.parseDouble(selectedGaugeValueText.getText());
-                GaugeSetup gauge = (GaugeSetup) context.getGauge(selectedGaugeLabel.getText().trim());
-                gauge.getGauge().setValue(newValue);
+                GaugeSetup gauge = (GaugeSetup) context
+                        .getGauge(selectedGaugeLabel.getText().trim());
+                if (gauge != null) {
+                    UpdateGaugeThread updateThread = 
+                            new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
+                    updateThread.start();
+                }
             }
         });
         c.gridx = 0;

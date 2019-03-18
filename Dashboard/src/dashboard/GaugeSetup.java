@@ -2,6 +2,7 @@ package dashboard;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
@@ -37,12 +38,13 @@ public class GaugeSetup extends JPanel{
     private void buildPanel(String name, String type)
     {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setTitle(name);
+        
         setAlignmentX(Component.CENTER_ALIGNMENT);
         
         gaugeName = Helpers.createLabel(name);
         
         gauge = GaugeFactory.createRadialGauge(type);
+        
         gauge.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
@@ -51,13 +53,21 @@ public class GaugeSetup extends JPanel{
         });
         if (gauge instanceof LinearBargraph)
         {
+            gauge.setTrackStart(0.0);
+            gauge.setTrackStop(1.0);
+            
+            gauge.setSectionsVisible(true);
+            gauge.setTrackVisible(true);
+            gauge.setTrackStartColor(Color.yellow);
+            gauge.setTrackStopColor(Color.yellow);
             gauge.setPreferredSize(new Dimension(150,350));
         } else
         {
             gauge.setPreferredSize(new Dimension(350,350));
         }
-        setGaugeTitle(name);
+        setTitle(name);
         setGaugeUnit("unit");
+        
         add(gaugeName);
         add(gauge);
     }
@@ -70,12 +80,11 @@ public class GaugeSetup extends JPanel{
     private void initialiseEmptyPanel()
     {
         gaugeName = Helpers.createLabel("Default");
-        setTitle("Default");
+        
         
         gauge = GaugeFactory.createRadialGauge("");
         gauge.setPreferredSize(new Dimension(350,350));
-        setGaugeTitle("Default");
-        
+        setTitle("Default");
         add(gaugeName);
         add(gauge);
         
@@ -85,9 +94,6 @@ public class GaugeSetup extends JPanel{
         gauge.setUnitString(unit);
     }
 
-    public void setGaugeTitle(String title) {
-        gauge.setTitle(title);
-    }
 
     public String getTitle() {
         return title;
@@ -95,6 +101,8 @@ public class GaugeSetup extends JPanel{
 
     public void setTitle(String title) {
         this.title = title;
+        gaugeName.setText(title);
+        gauge.setTitle(title);
     }
     
     public AbstractGauge getGauge()

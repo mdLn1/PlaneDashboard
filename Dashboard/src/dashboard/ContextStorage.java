@@ -1,9 +1,7 @@
 package dashboard;
 
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ContextStorage {
     
@@ -23,11 +21,18 @@ public class ContextStorage {
     }
 
     public synchronized void addGauge(Object s, PairHeads c) {
-        gauges.put(s,c);
+        if (s instanceof SpecialisedGauge)
+        {
+            gauges.put(s,c);
+        } else {
+            GaugeSetup gauge = (GaugeSetup) s;
+            gauge.getGauge().setLedVisible(false);
+            gauges.put(s,c);
+        }
     }
     
     public HashMap<Object,PairHeads> getGauges()
-    {
+    {   
         return gauges;
     }
     
@@ -48,23 +53,24 @@ public class ContextStorage {
     {
         for (Object s: gauges.keySet())
         {
-            if (s instanceof SpecialisedGauge) {
-                SpecialisedGauge sg = (SpecialisedGauge) s;
-
-                if (sg.getTitle().equals(title)) {
-                    return s;
-                }
-            } else if (s instanceof RegularGauge) {
-                RegularGauge rg = (RegularGauge) s;
-
-                if (rg.getTitle().equals(title)) {
-                    return s;
-                }
-            }
+            GaugeSetup gs = (GaugeSetup) s;
+            if (gs.getTitle().equals(title))
+                return s;
             
         }
         
         return null;
     }
     
+    public void editGaugeTitle(String oldTitle, String newTitle) {
+        for (Object s: gauges.keySet())
+        {
+            GaugeSetup gs = (GaugeSetup) s;
+            if (gs.getTitle().equals(oldTitle))
+            {
+                gs.setTitle(newTitle);
+            }
+            
+        }
+    }
 }
