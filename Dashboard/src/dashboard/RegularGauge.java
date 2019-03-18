@@ -3,7 +3,8 @@ package dashboard;
 public class RegularGauge extends GaugeSetup implements GaugeAttributes {
 
     private String unit;
-    private PairHeads limits;
+    private int limitMin;
+    private int limitMax;
     
     public RegularGauge(String name, String type)
     {
@@ -16,6 +17,22 @@ public class RegularGauge extends GaugeSetup implements GaugeAttributes {
         super();
     }
     
+    public int getLimitMin() {
+        return limitMin;
+    }
+
+    public void setLimitMin(int limitMin) {
+        this.limitMin = limitMin;
+    }
+
+    public int getLimitMax() {
+        return limitMax;
+    }
+
+    public void setLimitMax(int limitMax) {
+        this.limitMax = limitMax;
+    }
+    
     @Override
     public String getUnit() {
         return unit;
@@ -26,17 +43,4 @@ public class RegularGauge extends GaugeSetup implements GaugeAttributes {
         this.unit = unit;
         setGaugeUnit(unit);
     }
-
-    @Override
-    public String getLimits() {
-        return limits.toString();
-    }
-
-    @Override
-    public void setLimits(int start, int finish) {
-        limits = new PairHeads(start, finish);
-    }
-    
-    
-    
 }

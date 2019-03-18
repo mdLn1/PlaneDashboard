@@ -4,7 +4,8 @@ package dashboard;
 public final class SpecialisedGauge extends RegularGauge {
     
     private boolean dangerZone = false;
-    private PairHeads dangerZoneRange;
+    private int dangerZoneMin;
+    private int dangerZoneMax;
 
     public SpecialisedGauge(String name, String type) {
         super(name, type);
@@ -21,12 +22,19 @@ public final class SpecialisedGauge extends RegularGauge {
         dangerZone = value;
     }
     
-    public PairHeads getDangerZoneRange() {
-        return dangerZoneRange;
+    public int getDangerZoneMin() {
+        return dangerZoneMin;
+    }
+    
+    public int getDangerZoneMax() {
+        return dangerZoneMax;
     }
 
-    public void setDangerZoneRange(int min, int max) {
-        dangerZoneRange = new PairHeads(min,max);
+    public void setDangerZoneMin(int min) {
+        dangerZoneMin = min;
+    }
+     public void setDangerZoneMax(int max) {
+        dangerZoneMax = max;
     }
     
     

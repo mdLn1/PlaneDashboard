@@ -17,6 +17,7 @@ public final class Helpers {
     public static final String DIRECTION_DIAL = "Direction Radial";
     private static final Font FONT_BUTTON = new Font("Calibri", Font.PLAIN, 16);
     private static final Font FONT_LABEL = new Font("Arial", Font.BOLD, 20);
+    private static final Font FONT_SMALL_LABEL = new Font("Arial", Font.BOLD, 14);
     
     public static JButton createButton(String name) {
         JButton button = new JButton(name);
@@ -30,6 +31,14 @@ public final class Helpers {
         JLabel label = new JLabel(name);
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         label.setFont(FONT_LABEL);
+        
+        return label;
+    }
+    
+    public static JLabel createSmallLabel(String name) {
+        JLabel label = new JLabel(name);
+        label.setAlignmentX(Component.CENTER_ALIGNMENT);
+        label.setFont(FONT_SMALL_LABEL);
         
         return label;
     }

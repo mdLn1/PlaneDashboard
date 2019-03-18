@@ -8,10 +8,12 @@ public interface GaugeAttributes {
         return "No unit set yet";
     }
     public void setUnit(String unit);
-    public default String getLimits()
-    {
-        return "No limits set yet";
-    }
-    public void setLimits(int start, int finish);
+    public int getLimitMin();
+
+    public void setLimitMin(int limitMin);
+
+    public int getLimitMax();
+
+    public void setLimitMax(int limitMax);
     
 }
