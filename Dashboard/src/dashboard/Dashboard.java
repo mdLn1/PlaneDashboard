@@ -4,6 +4,7 @@ import eu.hansolo.steelseries.extras.TrafficLight;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -14,10 +15,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
-import javafx.animation.AnimationTimer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -25,7 +26,7 @@ public final class Dashboard implements FrameSetup {
 
     ContextStorage context;
     
-    private AnimationTimer timer;
+    private JLabel warningLabel;
     
     private JFrame mainFrame;
     private Container rightContainer;
@@ -167,6 +168,10 @@ public final class Dashboard implements FrameSetup {
             // <editor-fold desc="additional components for a specialised gauge">
             editPanel.add(Helpers.createSeparatorYaxis());
             
+            
+            
+            editPanel.add(Helpers.createSeparatorYaxis());
+            
             dangerMinLabel = Helpers.createSmallLabel("Danger min limit for "
                     + specialGauge.getTitle());
             dangerMinLabel.setPreferredSize(new Dimension(280, 40));
@@ -181,7 +186,12 @@ public final class Dashboard implements FrameSetup {
                 public void actionPerformed(ActionEvent e) {
                     SpecialisedGauge gauge = (SpecialisedGauge) context
                             .getGauge(selectedGaugeLabel.getText().trim());
+                    try {
                     gauge.setDangerZoneMin(Double.parseDouble(dangerMinText.getText()));
+                    } catch (InvalidLimitsException ile) {
+                        dangerMinText.setText(gauge.getDangerZoneMin() + "");
+                        JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
+                    }
                 }
 
             });
@@ -201,21 +211,12 @@ public final class Dashboard implements FrameSetup {
                 public void actionPerformed(ActionEvent e) {
                     SpecialisedGauge gauge = (SpecialisedGauge) context
                             .getGauge(selectedGaugeLabel.getText().trim());
-                    gauge.setDangerZoneMin(Double.parseDouble(dangerMaxText.getText()));
-                    centerContainer.remove(gauge);
-                    gauge.getGauge().revalidate();
-                    gauge.getGauge().repaint();
-                    
-                    centerContainer.revalidate();
-                    centerContainer.repaint();
-                    gauge.revalidate();
-                    gauge.repaint();
-                    
-                    GridBagConstraints c = new GridBagConstraints();
-                    c.gridx = context.getConstraints(gauge.getTitle()).getStart();
-                    c.gridy = context.getConstraints(gauge.getTitle()).getEnd();
-                    centerContainer.add(gauge,c);
-                    
+                    try {
+                    gauge.setDangerZoneMax(Double.parseDouble(dangerMaxText.getText()));
+                    } catch (InvalidLimitsException ile) {
+                       dangerMaxText.setText(gauge.getDangerZoneMax() + "");
+                       JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
+                    }
                 }
 
             });
@@ -229,11 +230,21 @@ public final class Dashboard implements FrameSetup {
                 public void actionPerformed(ActionEvent e) {
                     SpecialisedGauge gauge = (SpecialisedGauge) context
                             .getGauge(selectedGaugeLabel.getText().trim());
+                    
+                    try {
                     gauge.setDangerZoneRange(Double.parseDouble(dangerMinText.getText()),
                             Double.parseDouble(dangerMaxText.getText()));
+                    } catch (InvalidLimitsException ile) {
+                       dangerMinText.setText(gauge.getDangerZoneMin() + "");
+                       dangerMaxText.setText(gauge.getDangerZoneMax() + "");
+                       JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
+                    }
+                            
                 }
 
             });
+            
+            editPanel.add(dangerRangeButton);
             // </editor-fold>
             
             createRegularFormInput((RegularGauge) gauge, editPanel);
@@ -254,8 +265,10 @@ public final class Dashboard implements FrameSetup {
         // <editor-fold desc="setting up title components to edit">
         titleLabel = Helpers.createSmallLabel("Set title for " + gauge.getTitle());
         titleLabel.setPreferredSize(new Dimension(280, 40));
+        container.add(titleLabel);
 
         titleTextField = Helpers.createTextField(gauge.getTitle());
+        
         container.add(titleTextField);
 
         titleButton = Helpers.createButton("Save title");

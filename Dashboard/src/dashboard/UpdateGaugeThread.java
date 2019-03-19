@@ -1,7 +1,6 @@
 package dashboard;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
-import eu.hansolo.steelseries.gauges.AbstractRadial;
 
 public class UpdateGaugeThread extends Thread {
 
@@ -16,6 +15,7 @@ public class UpdateGaugeThread extends Thread {
     
     @Override
     public void run() {
+        synchronized (AbstractGauge.class) {
         double x = gauge.getMinValue();
         while (x < value) {
             x += 0.5;
@@ -23,8 +23,9 @@ public class UpdateGaugeThread extends Thread {
             try {
                 Thread.sleep(50);
             } catch (Exception ex) {
-
+                System.out.println("thread blocked from sleep");
             }
+        }
         }
     }
     
