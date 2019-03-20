@@ -10,7 +10,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class GaugeSetup extends JPanel{
+public class GaugeSetup extends JPanel implements SetPanel{
 
     private String title;
     private JLabel gaugeName;
@@ -34,7 +34,8 @@ public class GaugeSetup extends JPanel{
     }
     
     //create gauge and label defined by name and type
-    private void buildPanel(String name, String type)
+    @Override
+    public void buildPanel(String name, String type)
     {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         
@@ -42,7 +43,7 @@ public class GaugeSetup extends JPanel{
         
         gaugeName = Helpers.createLabel(name);
         
-        gauge = GaugeFactory.createRadialGauge(type);
+        gauge = (AbstractGauge) GaugeFactory.createRadialGauge(type);
         
 //        gauge.addMouseListener(new MouseAdapter() {
 //            @Override
@@ -71,11 +72,11 @@ public class GaugeSetup extends JPanel{
     } 
     
     //create gauge and label if no parameters defined
-    private void initialiseEmptyPanel()
+    public void initialiseEmptyPanel()
     {
         gaugeName = Helpers.createLabel("Default");
         
-        gauge = GaugeFactory.createRadialGauge("");
+        gauge = (AbstractGauge) GaugeFactory.createRadialGauge("");
         gauge.setPreferredSize(new Dimension(350,350));
         setTitle("Default");
         add(gaugeName);
@@ -98,6 +99,7 @@ public class GaugeSetup extends JPanel{
         gauge.setTitle(title);
     }
     
+    @Override
     public AbstractGauge getGauge()
     {
         return gauge;

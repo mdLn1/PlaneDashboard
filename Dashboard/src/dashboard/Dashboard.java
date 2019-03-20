@@ -1,10 +1,9 @@
 package dashboard;
 
-import eu.hansolo.steelseries.extras.TrafficLight;
+
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -17,6 +16,8 @@ import java.awt.event.MouseEvent;
 import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -26,16 +27,21 @@ public final class Dashboard implements FrameSetup {
 
     ContextStorage context;
     
-    private JLabel warningLabel;
     
     private JFrame mainFrame;
     private Container rightContainer;
     private Container centerContainer;
     
     // <editor-fold desc="rightContainer JComponents">
+    private JButton playSimulationButton;
+    
     private JLabel selectedGaugeLabel;
     private JTextField selectedGaugeValueText;
+    private JButton selectedGaugeValueButton;
     
+    private JCheckBox redLightCheckBox;
+    private JCheckBox yellowLightCheckBox;
+    private JCheckBox greenLightCheckBox;
     
     // <editor-fold desc="dynamically generated panel for gauge details editing">
     
@@ -110,41 +116,52 @@ public final class Dashboard implements FrameSetup {
         context.addGauge(quarterDial, new PairHeads(1, 1));
         // </editor-fold>
         
-        TrafficLight trafficLight = new TrafficLight();
-        trafficLight.setPreferredSize(new Dimension(300, 300));
+        TrafficLightSetup trafficLight = new TrafficLightSetup("Traffic Light", "Traffic Light");
+        
+        trafficLight.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent evt) {
+                    adjustRightContainer((TrafficLightSetup) trafficLight);
+                }
+
+            });
         c.gridx = 2;
         c.gridy = 1;
-
         container.add(trafficLight, c);
 
         // <editor-fold desc="add mouse listener for every gauge + add every gauge to the main container">
         for (Map.Entry<Object, PairHeads> g : context.getGauges().entrySet()) {
-            GaugeSetup tempGauge = (GaugeSetup) g.getKey(); 
-            tempGauge.getGauge().addMouseListener(new MouseAdapter() {
+            JComponent tempGauge = (JComponent) g.getKey(); 
+            tempGauge.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent evt) {
                     if (g.getKey() instanceof SpecialisedGauge) {
-                        selectedGaugeLabel.setText(tempGauge.getTitle());
-                        adjustRightContainer((SpecialisedGauge) g.getKey());
+                        SpecialisedGauge sg = (SpecialisedGauge) g.getKey();
+                        selectedGaugeLabel.setText(sg.getTitle());
+                        adjustRightContainer(sg);
                         
                     } else if (g.getKey() instanceof RegularGauge) {
-                        selectedGaugeLabel.setText(tempGauge.getTitle());
-                        adjustRightContainer((RegularGauge) g.getKey());
-                    } else {
-                        System.out.println("Got clicked");
+                        RegularGauge rg = (RegularGauge) g.getKey();
+                        selectedGaugeLabel.setText(rg.getTitle());
+                        adjustRightContainer(rg);
+                    } else if (g.getKey() instanceof TrafficLightSetup){
+                        adjustRightContainer((TrafficLightSetup) trafficLight);
                     }
 
                 }
 
             });
+            if (g.getKey() instanceof GaugeSetup) {
+                SetPanel sp = (SetPanel) g.getKey();
+                PairHeads positions = context.getConstraints(sp.getTitle());
+                c.gridx = positions.getStart();
+                c.gridy = positions.getEnd();
+                container.add(tempGauge, c);
+            }
             
-            PairHeads positions = context.getConstraints(tempGauge.getTitle());
-            c.gridx = positions.getStart();
-            c.gridy = positions.getEnd();
-            container.add(tempGauge, c);
 
         }
-        
+        context.addGauge(trafficLight, new PairHeads(1,2));
          // </editor-fold>
 
     }
@@ -157,19 +174,19 @@ public final class Dashboard implements FrameSetup {
         editPanel = new JPanel();
         editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
         editPanel.setAlignmentX(Component.TOP_ALIGNMENT);
-        
-        dangerLabel = Helpers.createLabel("Edit Panel for Gauges");
+        if (!selectedGaugeValueText.isVisible()) {
+            selectedGaugeValueText.setVisible(true);
+            selectedGaugeValueButton.setVisible(true);
+        }
+        SetPanel selectedGauge = (SetPanel) gauge;
+        dangerLabel = Helpers.createLabel("Edit Panel for " + selectedGauge.getTitle());
         dangerLabel.setPreferredSize(new Dimension(280, 40));
         editPanel.add(dangerLabel);
-            
+        
         if (gauge instanceof SpecialisedGauge) {
             SpecialisedGauge specialGauge = (SpecialisedGauge) gauge;
             
             // <editor-fold desc="additional components for a specialised gauge">
-            editPanel.add(Helpers.createSeparatorYaxis());
-            
-            
-            
             editPanel.add(Helpers.createSeparatorYaxis());
             
             dangerMinLabel = Helpers.createSmallLabel("Danger min limit for "
@@ -251,6 +268,47 @@ public final class Dashboard implements FrameSetup {
             
         } else if (gauge instanceof RegularGauge) {
             createRegularFormInput((RegularGauge) gauge, editPanel);
+        } else if (gauge instanceof TrafficLightSetup) {
+            TrafficLightSetup traffic = (TrafficLightSetup) gauge;
+            editPanel.add(Helpers.createSeparatorYaxis());
+            
+            redLightCheckBox = new JCheckBox("Red Light", traffic.getGauge().isRedOn());
+            redLightCheckBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    traffic.getGauge().setRedOn(!traffic.getGauge().isRedOn());
+                }
+            });
+            yellowLightCheckBox = new JCheckBox("Yellow Light", traffic.getGauge().isYellowOn());
+            yellowLightCheckBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    traffic.getGauge().setYellowOn(!traffic.getGauge().isYellowOn());
+                }
+            });
+            greenLightCheckBox = new JCheckBox("Green Light", traffic.getGauge().isGreenOn());
+            greenLightCheckBox.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    traffic.getGauge().setGreenOn(!traffic.getGauge().isGreenOn());
+                }
+            });
+            
+            editPanel.add(Helpers.createSeparatorYaxis());
+            editPanel.add(redLightCheckBox);
+            editPanel.add(yellowLightCheckBox);
+            editPanel.add(greenLightCheckBox);
+            selectedGaugeLabel.setText("Traffic Light");
+            selectedGaugeValueText.setVisible(false);
+            selectedGaugeValueButton.setVisible(false);
+            
+            GridBagConstraints c = new GridBagConstraints();
+            c = Helpers.addConstraints(0, 2);
+            c.fill = GridBagConstraints.HORIZONTAL;
+            c.anchor = GridBagConstraints.PAGE_START;
+            rightContainer.revalidate();
+            rightContainer.repaint();
+            rightContainer.add(editPanel, c);
         }
 
     }
@@ -277,7 +335,9 @@ public final class Dashboard implements FrameSetup {
             public void actionPerformed(ActionEvent e) {
                 GaugeSetup gauge = (GaugeSetup) context
                         .getGauge(selectedGaugeLabel.getText().trim());
-                gauge.setTitle(titleTextField.getText());
+                context.editGaugeTitle(gauge.getTitle(), titleTextField.getText().trim());
+                selectedGaugeLabel.setText(titleTextField.getText().trim());
+                
             }
             
         });
@@ -307,7 +367,7 @@ public final class Dashboard implements FrameSetup {
         // </editor-fold>
         
         //rebuild the whole container (EAST)
-        c = Helpers.addConstraints(0, 1);
+        c = Helpers.addConstraints(0, 2);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
         rightContainer.revalidate();
@@ -332,11 +392,23 @@ public final class Dashboard implements FrameSetup {
 
     @Override
     public void addComponentToRightContainer(Container container) {
+        playSimulationButton = Helpers.createButton("Play Simulation");
+        GridBagConstraints c = new GridBagConstraints();
+        playSimulationButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    rightContainer.removeAll();
+                    rightContainer.add(playSimulationButton);
+            }
+            
+        });
+        
+        
         JPanel boxedPanel = new JPanel();
         boxedPanel.setLayout(new GridBagLayout());
         //boxedPanel.setPreferredSize(new Dimension(250,400));
         boxedPanel.setAlignmentX(Component.TOP_ALIGNMENT);
-        GridBagConstraints c = new GridBagConstraints();
+        
 
         selectedGaugeLabel = Helpers.createLabel("Selected Gauge");
         selectedGaugeLabel.setPreferredSize(new Dimension(240, 40));
@@ -349,8 +421,8 @@ public final class Dashboard implements FrameSetup {
         c.fill = GridBagConstraints.HORIZONTAL;
         boxedPanel.add(selectedGaugeValueText, c);
 
-        JButton saveDetailsGauge = Helpers.createButton("Save value");
-        saveDetailsGauge.addActionListener(new ActionListener() {   
+        selectedGaugeValueButton = Helpers.createButton("Save value");
+        selectedGaugeValueButton.addActionListener(new ActionListener() {   
             @Override
             public void actionPerformed(ActionEvent e) {
                 double newValue = Double.parseDouble(selectedGaugeValueText.getText());
@@ -366,16 +438,23 @@ public final class Dashboard implements FrameSetup {
         c.gridx = 0;
         c.gridy = 2;
         c.fill = GridBagConstraints.NONE;
-        boxedPanel.add(saveDetailsGauge, c);
-
+        boxedPanel.add(selectedGaugeValueButton, c);
         c.gridx = 0;
         c.gridy = 0;
-        c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
+        container.add(playSimulationButton, c);
+        c.gridx = 0;
+        c.gridy = 1;
+        c.fill = GridBagConstraints.HORIZONTAL;
         container.add(boxedPanel, c);
+        
 
     }
     
+    
+    public void createSimulationInputPanel() {
+        
+    }
     
    
     public static void main(String[] args) {
