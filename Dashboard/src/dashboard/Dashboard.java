@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 
 public final class Dashboard implements FrameSetup {
 
-    ContextStorage context;
+    private ContextStorage context;
     
     
     private JFrame mainFrame;
@@ -74,7 +74,8 @@ public final class Dashboard implements FrameSetup {
     // </editor-fold>
     
     private JPanel editPanel;
-    JPanel boxedPanel;
+    private JPanel gaugeValuePanel;
+    private JPanel simulationInputsPanel;
     
     private JLabel unitLabel;
     private JButton unitButton;
@@ -193,10 +194,15 @@ public final class Dashboard implements FrameSetup {
         editPanel = new JPanel();
         editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
         editPanel.setAlignmentX(Component.TOP_ALIGNMENT);
-        if (!selectedGaugeValueText.isVisible()) {
-            selectedGaugeValueText.setVisible(true);
-            selectedGaugeValueButton.setVisible(true);
+        if (simulationInputsPanel != null) 
+        {
+            rightContainer.remove(simulationInputsPanel);
         }
+        
+        if (!gaugeValuePanel.isVisible()) {
+            gaugeValuePanel.setVisible(true);
+        }
+        
         SetPanel selectedGauge = (SetPanel) gauge;
         dangerLabel = Helpers.createLabel("Edit Panel for " + selectedGauge.getTitle());
         dangerLabel.setPreferredSize(new Dimension(280, 40));
@@ -317,9 +323,8 @@ public final class Dashboard implements FrameSetup {
             editPanel.add(redLightCheckBox);
             editPanel.add(yellowLightCheckBox);
             editPanel.add(greenLightCheckBox);
-            selectedGaugeLabel.setText("Traffic Light");
-            selectedGaugeValueText.setVisible(false);
-            selectedGaugeValueButton.setVisible(false);
+            
+            gaugeValuePanel.setVisible(false);
             
             GridBagConstraints c = new GridBagConstraints();
             c = Helpers.addConstraints(0, 2);
@@ -416,28 +421,27 @@ public final class Dashboard implements FrameSetup {
         playSimulationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    rightContainer.removeAll();
-                    rightContainer.add(playSimulationButton);
+                    createSimulationInputPanel();
             }
             
         });
         
         
-        boxedPanel = new JPanel();
-        boxedPanel.setLayout(new GridBagLayout());
-        boxedPanel.setAlignmentX(Component.TOP_ALIGNMENT);
+        gaugeValuePanel = new JPanel();
+        gaugeValuePanel.setLayout(new GridBagLayout());
+        gaugeValuePanel.setAlignmentX(Component.TOP_ALIGNMENT);
         
 
         selectedGaugeLabel = Helpers.createLabel("Selected Gauge");
         selectedGaugeLabel.setPreferredSize(new Dimension(240, 40));
         c = Helpers.addConstraints(0, 0,1.0,0.8);
         c.fill = GridBagConstraints.HORIZONTAL;
-        boxedPanel.add(selectedGaugeLabel, c);
+        gaugeValuePanel.add(selectedGaugeLabel, c);
 
         selectedGaugeValueText = Helpers.createTextField("");
         c = Helpers.addConstraints(0, 1);
         c.fill = GridBagConstraints.HORIZONTAL;
-        boxedPanel.add(selectedGaugeValueText, c);
+        gaugeValuePanel.add(selectedGaugeValueText, c);
 
         selectedGaugeValueButton = Helpers.createButton("Save value");
         selectedGaugeValueButton.addActionListener(new ActionListener() {   
@@ -456,15 +460,16 @@ public final class Dashboard implements FrameSetup {
         c.gridx = 0;
         c.gridy = 2;
         c.fill = GridBagConstraints.NONE;
-        boxedPanel.add(selectedGaugeValueButton, c);
+        gaugeValuePanel.add(selectedGaugeValueButton, c);
         c.gridx = 0;
         c.gridy = 0;
+        c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
         container.add(playSimulationButton, c);
         c.gridx = 0;
         c.gridy = 1;
         c.fill = GridBagConstraints.HORIZONTAL;
-        container.add(boxedPanel, c);
+        container.add(gaugeValuePanel, c);
         
 
     }
@@ -476,19 +481,67 @@ public final class Dashboard implements FrameSetup {
         playSpeedLabel = Helpers.createSmallLabel("Speed Value");
         playTemperatureLabel = Helpers.createSmallLabel("Temperature Value");
         playWindDirectionLabel = Helpers.createSmallLabel("Wind Direction Value");
+        playWindDirectionLabel.setPreferredSize(new Dimension(220,30));
         
         playAirPressureText = Helpers.createTextField("");
         playSpeedText = Helpers.createTextField("");
         playTemperatureText = Helpers.createTextField("");
         playFuelText = Helpers.createTextField("");
         playWindDirectionText = Helpers.createTextField("");
+        if (simulationInputsPanel != null) 
+        {
+            rightContainer.remove(simulationInputsPanel);
+        }
+        
         
         runSimulationButton = Helpers.createButton("Run simulator");
+        runSimulationButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+               playFuelText.getText().trim();
+               playAirPressureText.getText().trim();
+               playSpeedText.getText().trim();
+               playTemperatureText.getText().trim();
+               playWindDirectionText.getText().trim();
+                       
+            }
+        });
         
         GridBagConstraints c = new GridBagConstraints();
         
+        simulationInputsPanel = new JPanel();
+        simulationInputsPanel.setLayout(new BoxLayout(simulationInputsPanel, BoxLayout.Y_AXIS));
+        simulationInputsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
+        simulationInputsPanel.add(playAirPressureLabel);
+        simulationInputsPanel.add(playAirPressureText);
+        simulationInputsPanel.add(playSpeedLabel);
+        simulationInputsPanel.add(playSpeedText);
+        simulationInputsPanel.add(playFuelLabel);
+        simulationInputsPanel.add(playFuelText);
+        simulationInputsPanel.add(playWindDirectionLabel);
+        simulationInputsPanel.add(playWindDirectionText);
+        simulationInputsPanel.add(playTemperatureLabel);
+        simulationInputsPanel.add(playTemperatureText);
+        simulationInputsPanel.add(Helpers.createSeparatorYaxis());
+        simulationInputsPanel.add(runSimulationButton);
+       
+        c.gridx = 0;
+        c.gridy = 2;
+        c.anchor = GridBagConstraints.PAGE_START;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        simulationInputsPanel.add(Helpers.createSeparatorYaxis());
+        rightContainer.add(simulationInputsPanel, c);
         
+         if (editPanel != null) {
+            rightContainer.remove(editPanel);
+        }
+        rightContainer.revalidate();
+        rightContainer.repaint();
+         if (gaugeValuePanel.isVisible())
+        {
+            gaugeValuePanel.setVisible(false);
+        }
     }
     
    

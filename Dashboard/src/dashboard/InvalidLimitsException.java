@@ -24,6 +24,7 @@ public class InvalidLimitsException extends Exception {
         this.maxLimit = maxLimit;
     }
     
+    @Override
     public String toString() {
         if (max < min)
         {
