@@ -33,7 +33,24 @@ public final class Dashboard implements FrameSetup {
     private Container centerContainer;
     
     // <editor-fold desc="rightContainer JComponents">
+    // <editor-fold desc="simulation panel">
     private JButton playSimulationButton;
+    
+    private JLabel  playSpeedLabel;
+    private JLabel  playAirPressureLabel;
+    private JLabel  playTemperatureLabel;
+    private JLabel  playWindDirectionLabel;
+    private JLabel  playFuelLabel;
+    
+    private JTextField playSpeedText;
+    private JTextField playAirPressureText;
+    private JTextField playTemperatureText;
+    private JTextField playWindDirectionText;
+    private JTextField playFuelText;
+    
+    private JButton runSimulationButton;
+    
+    // </editor-fold>
     
     private JLabel selectedGaugeLabel;
     private JTextField selectedGaugeValueText;
@@ -57,6 +74,8 @@ public final class Dashboard implements FrameSetup {
     // </editor-fold>
     
     private JPanel editPanel;
+    JPanel boxedPanel;
+    
     private JLabel unitLabel;
     private JButton unitButton;
     private JTextField unitTextField;
@@ -404,9 +423,8 @@ public final class Dashboard implements FrameSetup {
         });
         
         
-        JPanel boxedPanel = new JPanel();
+        boxedPanel = new JPanel();
         boxedPanel.setLayout(new GridBagLayout());
-        //boxedPanel.setPreferredSize(new Dimension(250,400));
         boxedPanel.setAlignmentX(Component.TOP_ALIGNMENT);
         
 
@@ -453,6 +471,23 @@ public final class Dashboard implements FrameSetup {
     
     
     public void createSimulationInputPanel() {
+        playAirPressureLabel = Helpers.createSmallLabel("Air Pressure Value");
+        playFuelLabel = Helpers.createSmallLabel("Fuel Value");
+        playSpeedLabel = Helpers.createSmallLabel("Speed Value");
+        playTemperatureLabel = Helpers.createSmallLabel("Temperature Value");
+        playWindDirectionLabel = Helpers.createSmallLabel("Wind Direction Value");
+        
+        playAirPressureText = Helpers.createTextField("");
+        playSpeedText = Helpers.createTextField("");
+        playTemperatureText = Helpers.createTextField("");
+        playFuelText = Helpers.createTextField("");
+        playWindDirectionText = Helpers.createTextField("");
+        
+        runSimulationButton = Helpers.createButton("Run simulator");
+        
+        GridBagConstraints c = new GridBagConstraints();
+        
+        
         
     }
     
