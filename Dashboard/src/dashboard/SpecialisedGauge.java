@@ -8,8 +8,8 @@ public final class SpecialisedGauge extends RegularGauge {
     private double dangerZoneMin = 0.0;
     private double dangerZoneMax = 0.0;
 
-    public SpecialisedGauge(String name, String type) {
-        super(name, type);
+    public SpecialisedGauge(String name, String type, String unit) {
+        super(name, type, unit);
     }
 
 

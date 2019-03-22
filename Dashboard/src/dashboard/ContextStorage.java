@@ -1,6 +1,5 @@
 package dashboard;
 
-import eu.hansolo.steelseries.extras.TrafficLight;
 import java.util.HashMap;
 
 public class ContextStorage {
@@ -8,9 +7,11 @@ public class ContextStorage {
     private static ContextStorage instance = null;
 
     private HashMap<Object, PairHeads> gauges;
+    private HashMap<Object, PairHeads> gaugesBackup;
 
     private ContextStorage() {
         gauges = new HashMap<>();
+        gaugesBackup = new HashMap<>();
     }
 
     public static synchronized ContextStorage getInstance() {
@@ -35,34 +36,39 @@ public class ContextStorage {
     public HashMap<Object, PairHeads> getGauges() {
         return gauges;
     }
+    
+    public synchronized void backUpGauges() {
+        
+        gaugesBackup.putAll(gauges);
+    }
+    
+    public synchronized void reinitializeGauges() {
+        gauges.clear();
+        
+        //gauges.putAll(gaugesBackup);
+    }
 
-    public PairHeads getConstraints(String gg) {
+    public PairHeads getConstraints(Object gauge) {
         for (Object gs : gauges.keySet()) {
-            if (gs instanceof GaugeSetup) {
-                GaugeSetup gauge = (GaugeSetup) gs;
-                if (gauge.getTitle().equals(gg)) {
-                    return gauges.get(gs);
-                }
-            } else if (gs instanceof TrafficLightSetup) {
-                return new PairHeads(1,2);
+            if (gs.equals(gauge)) {
+                return gauges.get(gs);
             }
         }
-        return new PairHeads(0, 0);
+        return null;
     }
 
     public Object getGauge(String title) {
         for (Object s : gauges.keySet()) {
-            GaugeSetup gs = (GaugeSetup) s;
+            SetPanel gs = (SetPanel) s;
             if (gs.getTitle().equals(title)) {
                 return s;
             }
 
         }
-
         return null;
     }
 
-    public void editGaugeTitle(String oldTitle, String newTitle) {
+    public synchronized void editGaugeTitle(String oldTitle, String newTitle) {
         for (Object s : gauges.keySet()) {
             if (s instanceof SpecialisedGauge) {
                 SpecialisedGauge sg = (SpecialisedGauge) s;

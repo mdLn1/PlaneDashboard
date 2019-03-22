@@ -6,10 +6,10 @@ public class RegularGauge extends GaugeSetup implements GaugeAttributes {
     private int limitMin;
     private int limitMax;
     
-    public RegularGauge(String name, String type)
+    public RegularGauge(String name, String type, String unit)
     {
         super(name, type);
-        setUnit("unit");
+        setUnit(unit);
     }
     
     public RegularGauge()

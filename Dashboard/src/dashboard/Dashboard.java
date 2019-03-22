@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -27,13 +28,25 @@ public final class Dashboard implements FrameSetup {
 
     private ContextStorage context;
     
+    // <editor-fold desc="GUI components">
     
     private JFrame mainFrame;
     private Container rightContainer;
     private Container centerContainer;
     
+    // <editor-fold desc="mainContaienr components">
+    RegularGauge windDir;
+    RegularGauge airPressure;
+    SpecialisedGauge speed;
+    SpecialisedGauge temperature;
+    RegularGauge fuel;
+    TrafficLightSetup trafficLight;
+    
+    // </editor-fold>
+    
     // <editor-fold desc="rightContainer JComponents">
-    // <editor-fold desc="simulation panel">
+    
+    // <editor-fold desc="simulation panel input fields">
     private JButton playSimulationButton;
     
     private JLabel  playSpeedLabel;
@@ -41,24 +54,33 @@ public final class Dashboard implements FrameSetup {
     private JLabel  playTemperatureLabel;
     private JLabel  playWindDirectionLabel;
     private JLabel  playFuelLabel;
+    private JLabel  distanceLabel;
     
     private JTextField playSpeedText;
     private JTextField playAirPressureText;
     private JTextField playTemperatureText;
     private JTextField playWindDirectionText;
     private JTextField playFuelText;
+    private JTextField distanceText;
     
     private JButton runSimulationButton;
     
     // </editor-fold>
     
+    
+    // <editor-fold dexc="set Value for selected gauge">
     private JLabel selectedGaugeLabel;
     private JTextField selectedGaugeValueText;
     private JButton selectedGaugeValueButton;
     
+    // </editor-fold>
+    
+    // <editor-fold desc="traffic light components">
     private JCheckBox redLightCheckBox;
     private JCheckBox yellowLightCheckBox;
     private JCheckBox greenLightCheckBox;
+    
+    // </editor-fold>
     
     // <editor-fold desc="dynamically generated panel for gauge details editing">
     
@@ -88,6 +110,8 @@ public final class Dashboard implements FrameSetup {
     
     // </editor-fold>
     
+    
+    // constructor
     public Dashboard() {
         createGUI();
     }
@@ -97,11 +121,13 @@ public final class Dashboard implements FrameSetup {
     public void createGUI() {
         
         // <editor-fold desc="frame settings">
+        
         mainFrame = new JFrame("Plane Dashboard");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(2000, 1000);
         mainFrame.setPreferredSize(mainFrame.getSize());
         mainFrame.setLayout(new BorderLayout());
+        
         // </editor-fold>
         
         context = ContextStorage.getInstance();
@@ -116,27 +142,30 @@ public final class Dashboard implements FrameSetup {
     @Override
     public void addComponentsToMainContainer(Container container) {
 
+        context = ContextStorage.getInstance();
         // <editor-fold desc="create gauges and add them to ContextStorage singleton class">
-        RegularGauge windDir = new RegularGauge("Wind Direction", Helpers.DIRECTION_DIAL);
+        windDir = new RegularGauge("Wind Direction", Helpers.DIRECTION_DIAL, "Km/h");
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 0.5;
         c.weighty = 0.5;
         context.addGauge(windDir, new PairHeads(0, 0));
+        
 
-        RegularGauge halfdial = new RegularGauge("Air Pressure", Helpers.HALF_DIAL);
-        context.addGauge(halfdial, new PairHeads(1, 0));
+        airPressure = new RegularGauge("Air Pressure", Helpers.HALF_DIAL, "mmHg");
+        context.addGauge(airPressure, new PairHeads(1, 0));
 
-        SpecialisedGauge radial = new SpecialisedGauge("Speed", Helpers.SIMPLER_RADIAL);
-        context.addGauge(radial, new PairHeads(2, 0));
+        speed = new SpecialisedGauge("Speed", Helpers.SIMPLER_RADIAL, "Km/h");
+        context.addGauge(speed, new PairHeads(2, 0));
 
-        SpecialisedGauge temperature = new SpecialisedGauge("Temperature", Helpers.LINEAR_BAR);
+        temperature = new SpecialisedGauge("Temperature", Helpers.LINEAR_BAR, "Celsius");
         context.addGauge(temperature, new PairHeads(0, 1));
 
-        RegularGauge quarterDial = new RegularGauge("Fuel", Helpers.QUARTER_DIAL);
-        context.addGauge(quarterDial, new PairHeads(1, 1));
+        fuel = new RegularGauge("Fuel", Helpers.QUARTER_DIAL, "hectoL");
+        context.addGauge(fuel, new PairHeads(1, 1));
         // </editor-fold>
         
-        TrafficLightSetup trafficLight = new TrafficLightSetup("Traffic Light", "Traffic Light");
+        
+        trafficLight = new TrafficLightSetup("Traffic Light", "Traffic Light");
         
         trafficLight.addMouseListener(new MouseAdapter() {
                 @Override
@@ -145,8 +174,10 @@ public final class Dashboard implements FrameSetup {
                 }
 
             });
+        
         c.gridx = 2;
         c.gridy = 1;
+       
         container.add(trafficLight, c);
 
         // <editor-fold desc="add mouse listener for every gauge + add every gauge to the main container">
@@ -155,25 +186,15 @@ public final class Dashboard implements FrameSetup {
             tempGauge.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent evt) {
-                    if (g.getKey() instanceof SpecialisedGauge) {
-                        SpecialisedGauge sg = (SpecialisedGauge) g.getKey();
-                        selectedGaugeLabel.setText(sg.getTitle());
-                        adjustRightContainer(sg);
-                        
-                    } else if (g.getKey() instanceof RegularGauge) {
-                        RegularGauge rg = (RegularGauge) g.getKey();
-                        selectedGaugeLabel.setText(rg.getTitle());
-                        adjustRightContainer(rg);
-                    } else if (g.getKey() instanceof TrafficLightSetup){
-                        adjustRightContainer((TrafficLightSetup) trafficLight);
-                    }
-
+                    SetPanel sg = (SetPanel) g.getKey();
+                    selectedGaugeLabel.setText(sg.getTitle());
+                    adjustRightContainer(sg);
                 }
 
             });
             if (g.getKey() instanceof GaugeSetup) {
-                SetPanel sp = (SetPanel) g.getKey();
-                PairHeads positions = context.getConstraints(sp.getTitle());
+                //SetPanel sp = (SetPanel) g.getKey();
+                PairHeads positions = context.getConstraints(g.getKey());
                 c.gridx = positions.getStart();
                 c.gridy = positions.getEnd();
                 container.add(tempGauge, c);
@@ -181,7 +202,8 @@ public final class Dashboard implements FrameSetup {
             
 
         }
-        context.addGauge(trafficLight, new PairHeads(1,2));
+         context.addGauge(trafficLight, new PairHeads(2,1));
+         context.backUpGauges();
          // </editor-fold>
 
     }
@@ -357,7 +379,7 @@ public final class Dashboard implements FrameSetup {
         titleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GaugeSetup gauge = (GaugeSetup) context
+                SetPanel gauge = (SetPanel) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 context.editGaugeTitle(gauge.getTitle(), titleTextField.getText().trim());
                 selectedGaugeLabel.setText(titleTextField.getText().trim());
@@ -401,14 +423,17 @@ public final class Dashboard implements FrameSetup {
 
     @Override
     public void addComponentsToFrame(Container container) {
-        //edit container on the right
+       
+        centerContainer = new Container();
+        centerContainer.setLayout(new GridBagLayout());
+        addComponentsToMainContainer(centerContainer);
+        
+         //edit container on the right
         rightContainer = new Container();
         rightContainer.setLayout(new GridBagLayout());
         addComponentToRightContainer(rightContainer);
         
-        centerContainer = new Container();
-        centerContainer.setLayout(new GridBagLayout());
-        addComponentsToMainContainer(centerContainer);
+        
         container.add(centerContainer, BorderLayout.CENTER);
         container.add(rightContainer, BorderLayout.EAST);
 
@@ -418,12 +443,25 @@ public final class Dashboard implements FrameSetup {
     public void addComponentToRightContainer(Container container) {
         playSimulationButton = Helpers.createButton("Play Simulation");
         GridBagConstraints c = new GridBagConstraints();
+        
         playSimulationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    createSimulationInputPanel();
+                
+                mainFrame.remove(centerContainer);
+                centerContainer.removeAll();
+                context = ContextStorage.getInstance();
+                context.reinitializeGauges();
+                centerContainer = new Container();
+                centerContainer.setLayout(new GridBagLayout());
+                addComponentsToMainContainer(centerContainer);
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
+                mainFrame.add(centerContainer, BorderLayout.CENTER);
+                createSimulationInputPanel();
             }
-            
+
         });
         
         
@@ -482,12 +520,14 @@ public final class Dashboard implements FrameSetup {
         playTemperatureLabel = Helpers.createSmallLabel("Temperature Value");
         playWindDirectionLabel = Helpers.createSmallLabel("Wind Direction Value");
         playWindDirectionLabel.setPreferredSize(new Dimension(220,30));
+        distanceLabel = Helpers.createSmallLabel("Flight Distance");
         
         playAirPressureText = Helpers.createTextField("");
         playSpeedText = Helpers.createTextField("");
         playTemperatureText = Helpers.createTextField("");
         playFuelText = Helpers.createTextField("");
         playWindDirectionText = Helpers.createTextField("");
+        distanceText = Helpers.createTextField("");
         if (simulationInputsPanel != null) 
         {
             rightContainer.remove(simulationInputsPanel);
@@ -498,11 +538,16 @@ public final class Dashboard implements FrameSetup {
         runSimulationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-               playFuelText.getText().trim();
+               windDir.getGauge().setValue(Double.parseDouble(playWindDirectionText.getText().trim()));
+               fuel.getGauge().setValue(Double.parseDouble(playFuelText.getText().trim()));
+               trafficLight.getGauge().setRedOn(true);
+               
+               
+               
                playAirPressureText.getText().trim();
                playSpeedText.getText().trim();
                playTemperatureText.getText().trim();
-               playWindDirectionText.getText().trim();
+               distanceText.getText().trim(); 
                        
             }
         });
@@ -523,6 +568,8 @@ public final class Dashboard implements FrameSetup {
         simulationInputsPanel.add(playWindDirectionText);
         simulationInputsPanel.add(playTemperatureLabel);
         simulationInputsPanel.add(playTemperatureText);
+        simulationInputsPanel.add(distanceLabel);
+        simulationInputsPanel.add(distanceText);
         simulationInputsPanel.add(Helpers.createSeparatorYaxis());
         simulationInputsPanel.add(runSimulationButton);
        

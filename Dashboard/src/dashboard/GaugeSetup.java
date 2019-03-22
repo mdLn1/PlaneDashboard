@@ -13,12 +13,14 @@ import javax.swing.JPanel;
 public class GaugeSetup extends JPanel implements SetPanel{
 
     private String title;
+    private int id;
     private JLabel gaugeName;
     
     private AbstractGauge gauge;
 
     public GaugeSetup(String name, String type) {
         if (!name.isEmpty() && !type.isEmpty()) {
+            
             buildPanel(name, type);
             
         }
@@ -45,20 +47,14 @@ public class GaugeSetup extends JPanel implements SetPanel{
         
         gauge = (AbstractGauge) GaugeFactory.createRadialGauge(type);
         
-//        gauge.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent evt) {
-//                gaugeMouseClicked(evt);
-//            }
-//        });
 
         if (gauge instanceof LinearBargraph)
         {
             
-            gauge.setPreferredSize(new Dimension(150,350));
+            gauge.setPreferredSize(new Dimension(140,300));
         } else
         {
-            gauge.setPreferredSize(new Dimension(350,350));
+            gauge.setPreferredSize(new Dimension(300,300));
         }
         setTitle(name);
         setGaugeUnit("unit");
@@ -77,7 +73,14 @@ public class GaugeSetup extends JPanel implements SetPanel{
         gaugeName = Helpers.createLabel("Default");
         
         gauge = (AbstractGauge) GaugeFactory.createRadialGauge("");
-        gauge.setPreferredSize(new Dimension(350,350));
+        if (gauge instanceof LinearBargraph)
+        {
+            
+            gauge.setPreferredSize(new Dimension(140,300));
+        } else
+        {
+            gauge.setPreferredSize(new Dimension(300,300));
+        }
         setTitle("Default");
         add(gaugeName);
         add(gauge);
