@@ -1,6 +1,5 @@
 package dashboard;
 
-
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -199,8 +198,7 @@ public final class Dashboard implements FrameSetup {
                 c.gridy = positions.getEnd();
                 container.add(tempGauge, c);
             }
-            
-
+           
         }
          context.addGauge(trafficLight, new PairHeads(2,1));
          context.backUpGauges();
@@ -591,7 +589,6 @@ public final class Dashboard implements FrameSetup {
         }
     }
     
-   
     public static void main(String[] args) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
