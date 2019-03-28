@@ -58,5 +58,21 @@ public final class SpecialisedGauge extends RegularGauge {
         throw new InvalidLimitsException(min, max, getGauge().getMinValue(), getGauge().getMaxValue());
 
     }
+    
+     public void rebuildGaugeWithLimits(double min, double max) {
+            
+            this.remove(gauge);
+            
+            gauge.setTrackStartColor(Color.yellow);
+            gauge.setTrackStopColor(Color.yellow);
+            gauge.setTrackStart(min);
+            gauge.setTrackStop(max);
+            gauge.setTrackVisible(true);
+            
+            this.revalidate();
+            this.repaint();
+            this.add(gauge);
+    }
+    
 
 }

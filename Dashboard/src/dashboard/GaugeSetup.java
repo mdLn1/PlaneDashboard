@@ -16,7 +16,7 @@ public class GaugeSetup extends JPanel implements SetPanel{
     private int id;
     private JLabel gaugeName;
     
-    private AbstractGauge gauge;
+    AbstractGauge gauge;
 
     public GaugeSetup(String name, String type) {
         if (!name.isEmpty() && !type.isEmpty()) {
@@ -107,21 +107,6 @@ public class GaugeSetup extends JPanel implements SetPanel{
     {
         return gauge;
     }
-    
-    public void rebuildGaugeWithLimits(double min, double max) {
-            
-            this.remove(gauge);
-            
-            gauge.setTrackStartColor(Color.yellow);
-            gauge.setTrackStopColor(Color.yellow);
-            gauge.setTrackStart(min);
-            gauge.setTrackStop(max);
-            gauge.setTrackVisible(true);
-            
-            this.revalidate();
-            this.repaint();
-            this.add(gauge);
-    }
-    
+   
 
 }

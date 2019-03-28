@@ -2,6 +2,7 @@ package dashboard;
 
 import java.util.HashMap;
 
+// singleton pattern to store the gauges
 public class ContextStorage {
 
     private static ContextStorage instance = null;
