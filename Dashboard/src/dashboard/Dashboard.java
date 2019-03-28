@@ -1,5 +1,11 @@
 package dashboard;
 
+import Interfaces.FrameSetup;
+import Interfaces.SetPanel;
+import UIClasses.TrafficLightSetup;
+import UIClasses.RegularGauge;
+import UIClasses.SpecialisedGauge;
+import UIClasses.GaugeSetup;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;

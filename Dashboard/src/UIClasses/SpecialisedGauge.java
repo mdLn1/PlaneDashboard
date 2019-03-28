@@ -1,5 +1,6 @@
-package dashboard;
+package UIClasses;
 
+import dashboard.InvalidLimitsException;
 import eu.hansolo.steelseries.tools.Section;
 import java.awt.Color;
 

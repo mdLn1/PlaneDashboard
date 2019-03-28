@@ -1,5 +1,8 @@
-package dashboard;
+package UIClasses;
 
+import dashboard.GaugeFactory;
+import dashboard.Helpers;
+import Interfaces.SetPanel;
 import eu.hansolo.steelseries.extras.TrafficLight;
 import java.awt.Component;
 import java.awt.Dimension;

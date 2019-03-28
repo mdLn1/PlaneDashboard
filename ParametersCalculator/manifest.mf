@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Name: parameterscalculator/calculator.class
+Java-Bean: True

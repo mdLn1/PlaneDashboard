@@ -1,5 +1,8 @@
-package dashboard;
+package UIClasses;
 
+import dashboard.GaugeFactory;
+import dashboard.Helpers;
+import Interfaces.SetPanel;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import java.awt.Color;

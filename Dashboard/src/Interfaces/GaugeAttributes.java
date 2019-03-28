@@ -1,4 +1,4 @@
-package dashboard;
+package Interfaces;
 
 public interface GaugeAttributes {
     

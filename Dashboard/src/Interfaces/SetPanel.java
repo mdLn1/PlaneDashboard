@@ -1,5 +1,5 @@
 
-package dashboard;
+package Interfaces;
 
 public interface SetPanel {
     

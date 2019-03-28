@@ -1,5 +1,10 @@
 package dashboard;
 
+import Interfaces.SetPanel;
+import UIClasses.TrafficLightSetup;
+import UIClasses.RegularGauge;
+import UIClasses.SpecialisedGauge;
+import UIClasses.GaugeSetup;
 import java.util.HashMap;
 
 // singleton pattern to store the gauges

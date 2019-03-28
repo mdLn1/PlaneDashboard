@@ -1,4 +1,7 @@
-package dashboard;
+package UIClasses;
+
+import UIClasses.GaugeSetup;
+import Interfaces.GaugeAttributes;
 
 public class RegularGauge extends GaugeSetup implements GaugeAttributes {
 
