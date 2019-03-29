@@ -206,7 +206,6 @@ public final class Dashboard implements FrameSetup {
            
         }
          context.addGauge(trafficLight, new PairHeads(2,1));
-         context.backUpGauges();
          // </editor-fold>
 
     }

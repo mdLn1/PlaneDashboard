@@ -13,11 +13,9 @@ public class ContextStorage {
     private static ContextStorage instance = null;
 
     private HashMap<Object, PairHeads> gauges;
-    private HashMap<Object, PairHeads> gaugesBackup;
-
+    
     private ContextStorage() {
         gauges = new HashMap<>();
-        gaugesBackup = new HashMap<>();
     }
 
     public static synchronized ContextStorage getInstance() {
@@ -43,15 +41,10 @@ public class ContextStorage {
         return gauges;
     }
     
-    public synchronized void backUpGauges() {
-        
-        gaugesBackup.putAll(gauges);
-    }
     
     public synchronized void reinitializeGauges() {
         gauges.clear();
         
-        //gauges.putAll(gaugesBackup);
     }
 
     public PairHeads getConstraints(Object gauge) {

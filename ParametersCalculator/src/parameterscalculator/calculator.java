@@ -1,9 +1,12 @@
 package parameterscalculator;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 public class calculator extends javax.swing.JPanel {
 
     private double SCALE = 1.0;
-    private boolean upDownConversion = true;
+    NumberFormat formatter = new DecimalFormat("#0.##");
     
     public calculator() {
         initComponents();
@@ -19,14 +22,14 @@ public class calculator extends javax.swing.JPanel {
         return SCALE;
     }
     
-    public void getConverterName(String name)
-    {
-        converterNameLabel.setText(name);
-    }
-    
-    public String setConverterName()
+    public String getConverterName()
     {
         return converterNameLabel.getText();
+    }
+    
+    public void setConverterName(String name)
+    {
+        converterNameLabel.setText(name);
     }
     
     
@@ -133,13 +136,13 @@ public class calculator extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(value2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(unit2))
-                .addGap(0, 130, Short.MAX_VALUE))
+                .addGap(0, 16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void value1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_value1ActionPerformed
         try {
-        value2.setText(String.valueOf(Double.parseDouble(value1.getText()) * SCALE));
+        value2.setText(String.valueOf(formatter.format(Double.parseDouble(value1.getText()) * SCALE)));
         } catch(Exception ex)
         {
             value2.setText("Invalid data");
@@ -148,7 +151,7 @@ public class calculator extends javax.swing.JPanel {
 
     private void value2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_value2ActionPerformed
         try{
-        value1.setText(String.valueOf(Double.parseDouble(value1.getText()) / SCALE));
+        value1.setText(String.valueOf(formatter.format(Double.parseDouble(value1.getText()) / SCALE)));
         } catch(Exception ex)
         {
             value2.setText("Invalid data");
