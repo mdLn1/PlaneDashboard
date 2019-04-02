@@ -3,104 +3,24 @@
 <dashboard_script>
 	<dashboard_event>
 		<type>speed</type>
-		<value>5</value>
+		<value>90</value>
 	</dashboard_event>
 	<dashboard_event>
-		<type>petrol</type>
-		<value>95</value>
+		<type>airPressure</type>
+		<value>90</value>
 	</dashboard_event>
-	<delay>5</delay>
+	<delay>10</delay>
 	<dashboard_event>
-		<type>speed</type>
-		<value>10</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>93</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>20</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>91</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>speed</type>
+		<type>windDirection</type>
 		<value>40</value>
 	</dashboard_event>
 	<dashboard_event>
-		<type>petrol</type>
-		<value>89</value>
+		<type>fuel</type>
+		<value>90</value>
 	</dashboard_event>
-	<delay>5</delay>
+	<delay>10</delay>
 	<dashboard_event>
-		<type>speed</type>
-		<value>45</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>87</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>40</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>85</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>45</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>81</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>50</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>77</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>45</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>73</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>50</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>68</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>55</value>
-	</dashboard_event>
-	<dashboard_event>
-		<type>petrol</type>
-		<value>62</value>
-	</dashboard_event>
-	<delay>5</delay>
-	<dashboard_event>
-		<type>speed</type>
-		<value>60</value>
+		<type>temperature</type>
+		<value>90</value>
 	</dashboard_event>
 </dashboard_script>

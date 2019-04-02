@@ -19,6 +19,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,10 +29,16 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import uk.ac.gre.comp1549.dashboard.events.DashBoardEvent;
+import uk.ac.gre.comp1549.dashboard.events.DashBoardEventListener;
+import uk.ac.gre.comp1549.dashboard.scriptreader.DashboardEventGeneratorFromXML;
 
-public final class Dashboard implements FrameSetup {
+public final class Dashboard implements FrameSetup, Runnable {
 
     private ContextStorage context;
+    
+    public static final String XML_SCRIPT = "dashboard_script.xml";
     
     // <editor-fold desc="GUI components">
     
@@ -440,6 +448,12 @@ public final class Dashboard implements FrameSetup {
         container.add(rightContainer, BorderLayout.EAST);
 
     }
+    
+    public void doMainContainerUpdate() throws InterruptedException{
+        Thread newThread = new Thread(this);
+        newThread.start();
+        newThread.join();
+    }
 
     @Override
     public void addComponentToRightContainer(Container container) {
@@ -456,12 +470,20 @@ public final class Dashboard implements FrameSetup {
                 context.reinitializeGauges();
                 centerContainer = new Container();
                 centerContainer.setLayout(new GridBagLayout());
+//                try {
+//                    doMainContainerUpdate();
+//                } catch (InterruptedException ie) {
+//                    System.out.println("my sleep was interrupted");
+//                }
+                
                 addComponentsToMainContainer(centerContainer);
-
                 mainFrame.revalidate();
                 mainFrame.repaint();
                 mainFrame.add(centerContainer, BorderLayout.CENTER);
                 createSimulationInputPanel();
+                
+                
+                runXMLScript();
             }
 
         });
@@ -545,7 +567,6 @@ public final class Dashboard implements FrameSetup {
                trafficLight.getGauge().setRedOn(true);
                
                
-               
                playAirPressureText.getText().trim();
                playSpeedText.getText().trim();
                playTemperatureText.getText().trim();
@@ -593,24 +614,96 @@ public final class Dashboard implements FrameSetup {
         }
     }
     
-    public static void main(String[] args) {
+    /**
+     * Run the XML script file which generates events for the dashboard
+     * indicators
+     */
+    private void runXMLScript() {
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+            DashboardEventGeneratorFromXML dbegXML = new DashboardEventGeneratorFromXML();
+            
+            // Register for speed events from the XML script file
+            DashBoardEventListener dbelSpeed = new DashBoardEventListener() {
+                @Override
+                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
+                    ScriptGaugeThread speedThread = new ScriptGaugeThread(speed.getGauge(),
+                            Double.parseDouble(dbe.getValue()));
+                    speedThread.start();
                 }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Dashboard.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
+            };
+            dbegXML.registerDashBoardEventListener("speed", dbelSpeed);
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
+            // Register for airPressure events from the XML script file
+            DashBoardEventListener dbelAirPressure = new DashBoardEventListener() {
+                @Override
+                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
+                    ScriptGaugeThread speedThread = new ScriptGaugeThread(airPressure.getGauge(),
+                            Double.parseDouble(dbe.getValue()));
+                    speedThread.start();
+                }
+            };
+            dbegXML.registerDashBoardEventListener("airPressure", dbelAirPressure);
+            
+            // Register for fuel events from the XML script file
+            DashBoardEventListener dbelFuel = new DashBoardEventListener() {
+                @Override
+                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
+                    Thread fuelThread = new Thread(new ScriptGaugeThread(fuel.getGauge(),
+                            Double.parseDouble(dbe.getValue())));
+                    fuelThread.start();
+                }
+            };
+            dbegXML.registerDashBoardEventListener("fuel", dbelFuel);
+            
+            // Register for wind direction events from the XML script file
+            DashBoardEventListener dbelWindDirection = new DashBoardEventListener() {
+                @Override
+                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
+                    ScriptGaugeThread speedThread = new ScriptGaugeThread(windDir.getGauge(),
+                            Double.parseDouble(dbe.getValue()));
+                    speedThread.start();
+                }
+            };
+            dbegXML.registerDashBoardEventListener("windDirection", dbelWindDirection);
+            
+            // Register for temperature events from the XML script file
+            DashBoardEventListener dbelTemperature = new DashBoardEventListener() {
+                @Override
+                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
+                    Thread temperatureThread = new Thread(new ScriptGaugeThread(temperature.getGauge(),
+                            Double.parseDouble(dbe.getValue())));
+                    temperatureThread.start();
+                }
+            };
+            dbegXML.registerDashBoardEventListener("temperature", dbelTemperature);
+
+            // Process the script file - it willgenerate events as it runs
+            dbegXML.processScriptFile(XML_SCRIPT);
+
+        } catch (Exception ex) {
+            Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+   public static void main(String[] args) {
+        Dashboard me = new Dashboard();
+        
+    }
+
+    @Override
+    public void run() {
+        updateMainContainer();
+        
+    }
+
+    private void updateMainContainer() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                Dashboard dashboard = new Dashboard();
+                // Here, we can safely update the GUI
+                // because we'll be called from the
+                // event dispatch thread
+                addComponentsToMainContainer(centerContainer);
+                
             }
         });
     }
