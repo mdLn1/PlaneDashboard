@@ -5,6 +5,7 @@ import dashboard.Helpers;
 import Interfaces.SetPanel;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
+import eu.hansolo.steelseries.gauges.Radial;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -22,8 +23,10 @@ public class GaugeSetup extends JPanel implements SetPanel{
     AbstractGauge gauge;
 
     public GaugeSetup(String name, String type) {
+        
         if (!name.isEmpty() && !type.isEmpty()) {
-            
+            name = name.trim();
+            type = type.trim();
             buildPanel(name, type);
             
         }
@@ -49,11 +52,14 @@ public class GaugeSetup extends JPanel implements SetPanel{
         gaugeName = Helpers.createLabel(name);
         
         gauge = (AbstractGauge) GaugeFactory.createRadialGauge(type);
-        
+        if (gauge == null)
+        {
+            initialiseEmptyPanel();
+            return;
+        }
 
         if (gauge instanceof LinearBargraph)
         {
-            
             gauge.setPreferredSize(new Dimension(140,300));
         } else
         {
@@ -66,24 +72,15 @@ public class GaugeSetup extends JPanel implements SetPanel{
         add(gauge);
     }
     
-    private void gaugeMouseClicked(MouseEvent evt) {                                         
-        gaugeName.setText(gaugeName.getText().toUpperCase());
-    } 
     
     //create gauge and label if no parameters defined
     public void initialiseEmptyPanel()
     {
         gaugeName = Helpers.createLabel("Default");
         
-        gauge = (AbstractGauge) GaugeFactory.createRadialGauge("");
-        if (gauge instanceof LinearBargraph)
-        {
-            
-            gauge.setPreferredSize(new Dimension(140,300));
-        } else
-        {
-            gauge.setPreferredSize(new Dimension(300,300));
-        }
+        gauge = new Radial();
+        
+        gauge.setPreferredSize(new Dimension(300,300));
         setTitle("Default");
         add(gaugeName);
         add(gauge);

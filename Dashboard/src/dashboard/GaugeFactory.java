@@ -35,7 +35,7 @@ public class GaugeFactory {
                 Class theClass = (Class) savedGauges.get(type);
                 return (JComponent) theClass.newInstance();
             } else {
-                return new Radial();
+                return null;
             }
         } catch (Exception e) {
             e.printStackTrace();
