@@ -1,13 +1,22 @@
-package dashboard;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package Threading;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 
-public class ScriptGaugeThread extends Thread{
-    
+/**
+ *
+ * @author cp3526m
+ */
+public class SlowValueThread implements Runnable {
+
     private AbstractGauge gauge;
     private double value;
     
-    public ScriptGaugeThread(AbstractGauge gauge, double value) {
+    public SlowValueThread(AbstractGauge gauge, double value) {
         this.gauge = gauge;
         this.value = value;
     }
@@ -18,7 +27,7 @@ public class ScriptGaugeThread extends Thread{
         if (x < value)
         {
             while (x < value) {
-            x += 1.0;
+            x += 0.6;
             gauge.setValue(x);
             try {
                 Thread.sleep(100);
@@ -29,7 +38,7 @@ public class ScriptGaugeThread extends Thread{
         } else if (x > value)
         {
             while (x > value) {
-            x -= 1.0;
+            x -= 0.6;
             gauge.setValue(x);
             try {
                 Thread.sleep(100);
@@ -40,4 +49,5 @@ public class ScriptGaugeThread extends Thread{
         }
         
     }
+    
 }

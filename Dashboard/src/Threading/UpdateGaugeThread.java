@@ -1,4 +1,4 @@
-package dashboard;
+package Threading;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 
@@ -16,15 +16,29 @@ public class UpdateGaugeThread extends Thread {
     @Override
     public void run() {
         synchronized (AbstractGauge.class) {
-        double x = gauge.getMinValue();
-        while (x < value) {
-            x += 0.5;
+        double x = gauge.getValue();
+        if (x < value)
+        {
+            while (x < value) {
+            x += 1.0;
             gauge.setValue(x);
             try {
-                Thread.sleep(50);
+                Thread.sleep(70);
             } catch (Exception ex) {
                 System.out.println("thread blocked from sleep");
             }
+        }
+        } else if (x > value)
+        {
+            while (x > value) {
+            x -= 1.0;
+            gauge.setValue(x);
+            try {
+                Thread.sleep(70);
+            } catch (Exception ex) {
+                System.out.println("thread blocked from sleep");
+            }
+        }
         }
         }
     }
