@@ -24,16 +24,18 @@ public class RegularGauge extends GaugeSetup implements GaugeAttributes {
         return limitMin;
     }
 
-    public void setLimitMin(int limitMin) {
-        this.limitMin = limitMin;
+    public void setLimitMin(String limitMin) throws NumberFormatException, IllegalArgumentException{
+        this.gauge.setMinValue(Double.parseDouble(limitMin));
+        this.limitMin = Integer.parseInt(limitMin);
     }
 
     public int getLimitMax() {
         return limitMax;
     }
 
-    public void setLimitMax(int limitMax) {
-        this.limitMax = limitMax;
+    public void setLimitMax(String limitMax) throws NumberFormatException {
+        this.gauge.setMaxValue(Double.parseDouble(limitMax));
+        this.limitMax = Integer.parseInt(limitMax);
     }
     
     @Override

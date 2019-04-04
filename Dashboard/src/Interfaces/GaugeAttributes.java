@@ -10,10 +10,10 @@ public interface GaugeAttributes {
     public void setUnit(String unit);
     public int getLimitMin();
 
-    public void setLimitMin(int limitMin);
+    public void setLimitMin(String limitMin);
 
     public int getLimitMax();
 
-    public void setLimitMax(int limitMax);
+    public void setLimitMax(String limitMax);
     
 }

@@ -28,7 +28,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.geometry.VPos;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -37,7 +36,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import uk.ac.gre.comp1549.dashboard.events.DashBoardEvent;
@@ -50,7 +48,7 @@ public final class Dashboard implements FrameSetup, Runnable {
     
     public static final String SETGAUGES_SCRIPT = "dashboard_script.xml";
     public static final String SIMULATION_FILE = "simulation_script.xml";
-    public String xmlScript = SETGAUGES_SCRIPT;
+    private String xmlScript = SETGAUGES_SCRIPT;
 
     // <editor-fold desc="GUI components">
     private JFrame mainFrame;
@@ -125,6 +123,14 @@ public final class Dashboard implements FrameSetup, Runnable {
     private JLabel titleLabel;
     private JButton titleButton;
     private JTextField titleTextField;
+    
+    private JLabel minLimitLabel;
+    private JButton minLimitButton;
+    private JTextField minLimitTextField;
+    
+    private JLabel maxLimitLabel;
+    private JButton maxLimitButton;
+    private JTextField maxLimitTextField;
     // </editor-fold>
 
     // </editor-fold>
@@ -371,7 +377,6 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     //create an input form for editing gauges
     public void createRegularFormInput(RegularGauge gauge, Container container) {
-        String selected = selectedGaugeLabel.getText();
         selectedGaugeValueText.setText(gauge.getGauge().getValue() + "");
         GridBagConstraints c = new GridBagConstraints();
 
@@ -418,7 +423,56 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         });
         container.add(unitButton);
+        
+        minLimitLabel = Helpers.createSmallLabel("Set minimum for " + gauge.getTitle());
+        container.add(minLimitLabel);
 
+        minLimitTextField = Helpers.createTextField("" + gauge.getLimitMin());
+        container.add(minLimitTextField);
+
+        minLimitButton = Helpers.createButton("Save minimum");
+        minLimitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegularGauge gauge = (RegularGauge) context
+                        .getGauge(selectedGaugeLabel.getText().trim());
+                try {
+                gauge.setLimitMin(minLimitTextField.getText());
+                } catch(NumberFormatException nfe){
+                    notifyNumberConversionError("minimum limit");
+                } catch (IllegalArgumentException ile) {
+                    notifyIllegalArgumentError("minimum limit");
+                }
+            }
+
+        });
+        container.add(minLimitButton);
+        
+        maxLimitLabel = Helpers.createSmallLabel("Set maximum for " + gauge.getTitle());
+        container.add(maxLimitLabel);
+
+        maxLimitTextField = Helpers.createTextField("" + gauge.getLimitMax());
+        container.add(maxLimitTextField);
+
+        maxLimitButton = Helpers.createButton("Save maximum");
+        maxLimitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                RegularGauge gauge = (RegularGauge) context
+                        .getGauge(selectedGaugeLabel.getText().trim());
+                try {
+                gauge.setLimitMin(maxLimitTextField.getText());
+                } catch (NumberFormatException nfe)
+                {
+                    notifyNumberConversionError("maximum limit");
+                } catch (IllegalArgumentException ile) {
+                    notifyIllegalArgumentError("maximum limit");
+                }
+            }
+
+        });
+        container.add(maxLimitButton);
+        
         // </editor-fold>
         //rebuild the whole container (EAST)
         c = Helpers.addConstraints(0, 2);
@@ -467,6 +521,17 @@ public final class Dashboard implements FrameSetup, Runnable {
             newThread.start();
         }
 
+    }
+    
+    public void notifyNumberConversionError(String parameter){
+        JOptionPane.showMessageDialog(mainFrame, "Could not convert to number" + parameter
+                            + " format expected", "Error!", 0);
+    }
+    
+    public void notifyIllegalArgumentError(String parameter){
+        JOptionPane.showMessageDialog(mainFrame, "The value passed for " 
+                + parameter + " could not be set"
+                , "Error!", 0);
     }
 
     @Override
