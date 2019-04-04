@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import javax.swing.JFrame;
 
+// interface for setting up a JFrame if needed to use the same style
 public interface FrameSetup {
     
     public default void createGUI()

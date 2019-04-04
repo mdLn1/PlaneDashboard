@@ -1,16 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Threading;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 
-/**
- *
- * @author cp3526m
- */
+// do a slow updating, designed for fuel dial
 public class SlowValueThread implements Runnable {
 
     private AbstractGauge gauge;
@@ -21,6 +13,7 @@ public class SlowValueThread implements Runnable {
         this.value = value;
     }
     
+    // on run check if the new value is bigger or smaller than the previous one
     @Override
     public void run() {
         double x = gauge.getValue();
@@ -31,7 +24,7 @@ public class SlowValueThread implements Runnable {
             gauge.setValue(x);
             try {
                 Thread.sleep(100);
-            } catch (Exception ex) {
+            } catch (InterruptedException ex) {
                 System.out.println("thread blocked from sleep");
             }
         }
@@ -42,7 +35,7 @@ public class SlowValueThread implements Runnable {
             gauge.setValue(x);
             try {
                 Thread.sleep(100);
-            } catch (Exception ex) {
+            } catch (InterruptedException ex) {
                 System.out.println("thread blocked from sleep");
             }
         }

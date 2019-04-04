@@ -1,6 +1,6 @@
-
 package Interfaces;
 
+// setting up panels that contain a gauge or some 2D graphic element
 public interface SetPanel {
     
     void buildPanel(String name, String type);

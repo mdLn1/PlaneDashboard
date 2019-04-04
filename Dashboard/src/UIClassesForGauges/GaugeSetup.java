@@ -1,35 +1,35 @@
-package UIClasses;
+package UIClassesForGauges;
 
-import dashboard.GaugeFactory;
-import dashboard.Helpers;
+import DesignPatterns.GaugeFactory;
+import DesignPatterns.Helpers;
 import Interfaces.SetPanel;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import eu.hansolo.steelseries.gauges.Radial;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.event.MouseEvent;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+// super class for RegularGauge and SpecialisedGauge classess
 public class GaugeSetup extends JPanel implements SetPanel{
 
+    // title property
     private String title;
-    private int id;
-    private JLabel gaugeName;
     
+    //GUI components of the panel
+    private JLabel gaugeName;
     AbstractGauge gauge;
 
+    // constructor with two parameters
     public GaugeSetup(String name, String type) {
-        
+        // if nothing is passed in the constructor then do the same as the no-parameter constructor
         if (!name.isEmpty() && !type.isEmpty()) {
             name = name.trim();
             type = type.trim();
             buildPanel(name, type);
-            
-        }
+        } 
         else
         {
             initialiseEmptyPanel();
@@ -37,11 +37,12 @@ public class GaugeSetup extends JPanel implements SetPanel{
         
     }
     
+    // no parameters constructor
     public GaugeSetup() {
         initialiseEmptyPanel();
     }
     
-    //create gauge and label defined by name and type
+    //create dial and label defined by name and type
     @Override
     public void buildPanel(String name, String type)
     {
@@ -52,12 +53,13 @@ public class GaugeSetup extends JPanel implements SetPanel{
         gaugeName = Helpers.createLabel(name);
         
         gauge = (AbstractGauge) GaugeFactory.createRadialGauge(type);
+        
+        // if the mentioned type is not found, call initialise empty panel
         if (gauge == null)
         {
             initialiseEmptyPanel();
             return;
         }
-
         if (gauge instanceof LinearBargraph)
         {
             gauge.setPreferredSize(new Dimension(140,300));
@@ -73,7 +75,8 @@ public class GaugeSetup extends JPanel implements SetPanel{
     }
     
     
-    //create gauge and label if no parameters defined
+    //create default gauge and label if no parameters defined
+    @Override
     public void initialiseEmptyPanel()
     {
         gaugeName = Helpers.createLabel("Default");
@@ -87,21 +90,27 @@ public class GaugeSetup extends JPanel implements SetPanel{
         
     }
     
+    // set the unit for dial
     public void setGaugeUnit(String unit) {
         gauge.setUnitString(unit);
     }
 
 
+    // return the title of the panel
+    @Override
     public String getTitle() {
         return title;
     }
 
+    // set the tile of the panel, also change the one of the gauge
+    @Override
     public void setTitle(String title) {
         this.title = title;
         gaugeName.setText(title);
         gauge.setTitle(title);
     }
     
+    // return the gauge
     @Override
     public AbstractGauge getGauge()
     {

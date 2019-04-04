@@ -1,10 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package UIClasses;
 
+import UIClassesForGauges.GaugeSetup;
 import eu.hansolo.steelseries.extras.WindDirection;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.Radial;
@@ -15,13 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-/**
- *
- * @author mp7857c
- */
 public class GaugeSetupTest {
     
-    public GaugeSetupTest() {
+    public GaugeSetupTest() {//
     }
     
     @BeforeClass
@@ -40,9 +32,7 @@ public class GaugeSetupTest {
     public void tearDown() {
     }
 
-    /**
-     * Test of buildPanel method, of class GaugeSetup.
-     */
+    // test if the panel creates the expected dial with the desired specification
     @Test
     public void testBuildPanel() {
         String name = "Wind";
@@ -53,6 +43,7 @@ public class GaugeSetupTest {
         assertEquals(instance.getGauge().getClass(), WindDirection.class);
     }
     
+    // test what happens when name is an Empty String
     @Test
     public void testBuildPane1l() {
         String name = "";
@@ -63,20 +54,39 @@ public class GaugeSetupTest {
         assertEquals(instance.getGauge().getClass(), WindDirection.class);
     }
     
-     @Test
+    // test what happens when name is an Empty String and type is not a valid argument
+    @Test
     public void testBuildPane12() {
         String name = "";
         String type = "Direction";
         GaugeSetup instance = new GaugeSetup();
         instance.buildPanel(name, type);
         
-        assertEquals(instance.getGauge().getClass(), Radial
-                .class);
+        assertEquals(instance.getGauge().getClass(), Radial.class);
+    }
+    
+    // test what happens if type is an Empty String and name has a value
+    @Test
+    public void testBuildPane13() {
+        String name = "Wind";
+        String type = "";
+        GaugeSetup instance = new GaugeSetup();
+        instance.buildPanel(name, type);
+        assertEquals(instance.getGauge().getClass(), Radial.class);
+    }
+    
+    // test the outcome when both, name and type, are null
+    @Test
+    public void testBuildPane14() {
+        String name = null;
+        String type = null;
+        GaugeSetup instance = new GaugeSetup();
+        instance.buildPanel(name, type);
+        
+        assertEquals(instance.getGauge().getClass(), Radial.class);
     }
 
-    /**
-     * Test of initialiseEmptyPanel method, of class GaugeSetup.
-     */
+    // test method InitialiseEmptyPanel()
     @Test
     public void testInitialiseEmptyPanel() {
         GaugeSetup instance = new GaugeSetup();
@@ -85,9 +95,7 @@ public class GaugeSetupTest {
         assertEquals(instance.getGauge().getClass(), Radial.class);
     }
 
-    /**
-     * Test of setGaugeUnit method, of class GaugeSetup.
-     */
+    // test setter SetGaugeUnit() with empty string
     @Test
     public void testSetGaugeUnit() {
         String unit = "";
@@ -103,10 +111,17 @@ public class GaugeSetupTest {
         instance.setGaugeUnit(unit);
         assertEquals(unit, "123");
     }
+    
+    // test setter SetGaugeUnit() with null string
+    @Test
+    public void testSetGaugeUnit2() {
+        String unit = null;
+        GaugeSetup instance = new GaugeSetup();
+        instance.setGaugeUnit(unit);
+        assertEquals(unit, null);
+    }
 
-    /**
-     * Test of getTitle method, of class GaugeSetup.
-     */
+    // test getTitle() after creating a simple GaugeSetup
     @Test
     public void testGetTitle() {
         GaugeSetup instance = new GaugeSetup();
@@ -115,9 +130,7 @@ public class GaugeSetupTest {
         assertEquals(expResult, result);
     }
 
-    /**
-     * Test of setTitle method, of class GaugeSetup.
-     */
+    // test setTitle() by changing if the right title is received using the getter
     @Test
     public void testSetTitle() {
         String title = "title";
@@ -127,9 +140,7 @@ public class GaugeSetupTest {
         assertEquals(instance.getTitle(), "title");
     }
 
-    /**
-     * Test of getGauge method, of class GaugeSetup.
-     */
+    // test getGauge() when a simple GaugeSetup() is created
     @Test
     public void testGetGauge() {
         GaugeSetup instance = new GaugeSetup();

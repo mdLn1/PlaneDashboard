@@ -2,6 +2,8 @@ package Threading;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 
+// thread which does not allow updating different dials at the same time
+// mainly used when user edits the dial value
 public class UpdateGaugeThread extends Thread {
 
     
@@ -13,6 +15,7 @@ public class UpdateGaugeThread extends Thread {
         this.value = value;
     }
     
+    // on run check if the new value is bigger or smaller than the previous one
     @Override
     public void run() {
         synchronized (AbstractGauge.class) {

@@ -2,6 +2,7 @@ package Threading;
 
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 
+// synchronized thread that allows changing value on multiple gauges at the same time
 public class ScriptGaugeThread extends Thread{
     
     private AbstractGauge gauge;
@@ -12,6 +13,7 @@ public class ScriptGaugeThread extends Thread{
         this.value = value;
     }
     
+    // on run check if the new value is bigger or smaller than the previous one
     @Override
     public void run() {
         double x = gauge.getValue();

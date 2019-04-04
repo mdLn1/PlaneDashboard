@@ -1,7 +1,7 @@
-package UIClasses;
+package UIClassesForGauges;
 
-import dashboard.GaugeFactory;
-import dashboard.Helpers;
+import DesignPatterns.GaugeFactory;
+import DesignPatterns.Helpers;
 import Interfaces.SetPanel;
 import eu.hansolo.steelseries.extras.TrafficLight;
 import java.awt.Component;

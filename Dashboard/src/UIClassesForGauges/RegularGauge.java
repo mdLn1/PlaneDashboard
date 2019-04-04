@@ -1,6 +1,6 @@
-package UIClasses;
+package UIClassesForGauges;
 
-import UIClasses.GaugeSetup;
+import UIClassesForGauges.GaugeSetup;
 import Interfaces.GaugeAttributes;
 
 public class RegularGauge extends GaugeSetup implements GaugeAttributes {
@@ -24,7 +24,8 @@ public class RegularGauge extends GaugeSetup implements GaugeAttributes {
         return limitMin;
     }
 
-    public void setLimitMin(String limitMin) throws NumberFormatException, IllegalArgumentException{
+    public void setLimitMin(String limitMin) throws NumberFormatException, IllegalArgumentException
+    {
         this.gauge.setMinValue(Double.parseDouble(limitMin));
         this.limitMin = Integer.parseInt(limitMin);
     }

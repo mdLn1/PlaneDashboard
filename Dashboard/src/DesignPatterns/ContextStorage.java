@@ -1,52 +1,56 @@
-package dashboard;
+package DesignPatterns;
 
 import Interfaces.SetPanel;
-import UIClasses.TrafficLightSetup;
-import UIClasses.RegularGauge;
-import UIClasses.SpecialisedGauge;
-import UIClasses.GaugeSetup;
+import UIClassesForGauges.TrafficLightSetup;
+import UIClassesForGauges.RegularGauge;
+import UIClassesForGauges.SpecialisedGauge;
+import UIClassesForGauges.GaugeSetup;
+import dashboard.PairHeads;
 import java.util.HashMap;
 
-// singleton pattern to store the gauges
+// singleton class to store the gauges
 public class ContextStorage {
 
     private static ContextStorage instance = null;
 
     private HashMap<Object, PairHeads> gauges;
     
+    // private controller
     private ContextStorage() {
         gauges = new HashMap<>();
     }
 
+    // static method to return the instance, if exists
     public static synchronized ContextStorage getInstance() {
         if (instance == null) {
             instance = new ContextStorage();
         }
         return instance;
     }
-
+    
+    // add a gauge to the gauges HashMap together with its positions in GridBagLayout
     public synchronized void addGauge(Object s, PairHeads c) {
-        if (s instanceof SpecialisedGauge) {
-            gauges.put(s, c);
-        } else if (s instanceof RegularGauge) {
+        if (s instanceof RegularGauge) {
             GaugeSetup gauge = (GaugeSetup) s;
             gauge.getGauge().setLedVisible(false);
             gauges.put(s, c);
-        } else if (s instanceof TrafficLightSetup) {
+        } else {
             gauges.put(s, c);
         }
     }
 
+    // return all the gauges saved
     public HashMap<Object, PairHeads> getGauges() {
         return gauges;
     }
     
-    
+    // clear the HashMap
     public synchronized void reinitializeGauges() {
         gauges.clear();
         
     }
 
+    // get the postions of the gauge looked for
     public PairHeads getConstraints(Object gauge) {
         for (Object gs : gauges.keySet()) {
             if (gs.equals(gauge)) {
@@ -56,6 +60,7 @@ public class ContextStorage {
         return null;
     }
 
+    // find a gauge using its title
     public Object getGauge(String title) {
         for (Object s : gauges.keySet()) {
             SetPanel gs = (SetPanel) s;
@@ -67,6 +72,7 @@ public class ContextStorage {
         return null;
     }
 
+    // change the title of a gauge
     public synchronized void editGaugeTitle(String oldTitle, String newTitle) {
         for (Object s : gauges.keySet()) {
             if (s instanceof SpecialisedGauge) {

@@ -1,5 +1,7 @@
 package uk.ac.gre.comp1549.dashboard.scriptreader;
 
+// DashboardDemoProject provided code
+
 import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.*;

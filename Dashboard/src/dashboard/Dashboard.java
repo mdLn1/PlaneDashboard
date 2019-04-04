@@ -1,16 +1,18 @@
 package dashboard;
 
+import DesignPatterns.Helpers;
+import DesignPatterns.ContextStorage;
 import Threading.ScriptGaugeThread;
 import Threading.SlowValueThread;
 import Threading.UpdateGaugeThread;
-import Threading.GreenColorTimer;
+import Timers.GreenColorTimer;
 import Interfaces.FrameSetup;
 import Interfaces.SetPanel;
-import Threading.NotifySimulationResultTimer;
-import UIClasses.TrafficLightSetup;
-import UIClasses.RegularGauge;
-import UIClasses.SpecialisedGauge;
-import UIClasses.GaugeSetup;
+import Timers.NotifySimulationResultTimer;
+import UIClassesForGauges.TrafficLightSetup;
+import UIClassesForGauges.RegularGauge;
+import UIClassesForGauges.SpecialisedGauge;
+import UIClassesForGauges.GaugeSetup;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -44,8 +46,9 @@ import uk.ac.gre.comp1549.dashboard.scriptreader.DashboardEventGeneratorFromXML;
 
 public final class Dashboard implements FrameSetup, Runnable {
 
+    // singleton class
     private ContextStorage context;
-    
+
     public static final String SETGAUGES_SCRIPT = "dashboard_script.xml";
     public static final String SIMULATION_FILE = "simulation_script.xml";
     private String xmlScript = SETGAUGES_SCRIPT;
@@ -56,12 +59,12 @@ public final class Dashboard implements FrameSetup, Runnable {
     private Container centerContainer;
 
     // <editor-fold desc="mainContaienr components">
-    RegularGauge windDir;
-    RegularGauge airPressure;
-    SpecialisedGauge speed;
-    SpecialisedGauge temperature;
-    RegularGauge fuel;
-    TrafficLightSetup trafficLight;
+    private RegularGauge windDir;
+    private RegularGauge airPressure;
+    private SpecialisedGauge speed;
+    private SpecialisedGauge temperature;
+    private RegularGauge fuel;
+    private TrafficLightSetup trafficLight;
 
     // </editor-fold>
     // <editor-fold desc="rightContainer JComponents">
@@ -123,17 +126,18 @@ public final class Dashboard implements FrameSetup, Runnable {
     private JLabel titleLabel;
     private JButton titleButton;
     private JTextField titleTextField;
-    
+
     private JLabel minLimitLabel;
     private JButton minLimitButton;
     private JTextField minLimitTextField;
-    
+
     private JLabel maxLimitLabel;
     private JButton maxLimitButton;
     private JTextField maxLimitTextField;
     // </editor-fold>
 
     // </editor-fold>
+    
     // constructor
     public Dashboard() {
         createGUI();
@@ -182,7 +186,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         fuel = new RegularGauge("Fuel", Helpers.QUARTER_DIAL, "hectoL");
         context.addGauge(fuel, new PairHeads(1, 1));
-        // </editor-fold>
+        
 
         trafficLight = new TrafficLightSetup("Traffic Light", "Traffic Light");
 
@@ -198,7 +202,9 @@ public final class Dashboard implements FrameSetup, Runnable {
         c.gridy = 1;
 
         container.add(trafficLight, c);
-
+        
+        // </editor-fold>
+        
         // <editor-fold desc="add mouse listener for every gauge + add every gauge to the main container">
         for (Map.Entry<Object, PairHeads> g : context.getGauges().entrySet()) {
             JComponent tempGauge = (JComponent) g.getKey();
@@ -225,7 +231,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     }
 
-    //adjust the right container in the frame
+    //adjust the right container in the frame, depending on the action taken by user
     public void adjustRightContainer(Object gauge) {
         if (editPanel != null) {
             rightContainer.remove(editPanel);
@@ -332,6 +338,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         } else if (gauge instanceof RegularGauge) {
             createRegularFormInput((RegularGauge) gauge, editPanel);
         } else if (gauge instanceof TrafficLightSetup) {
+            // <editor-fold  desc="build the editing panel for traffic lights">
             TrafficLightSetup traffic = (TrafficLightSetup) gauge;
             editPanel.add(Helpers.createSeparatorYaxis());
 
@@ -371,6 +378,7 @@ public final class Dashboard implements FrameSetup, Runnable {
             rightContainer.revalidate();
             rightContainer.repaint();
             rightContainer.add(editPanel, c);
+            // </editor-fold>
         }
 
     }
@@ -390,21 +398,17 @@ public final class Dashboard implements FrameSetup, Runnable {
         container.add(titleTextField);
 
         titleButton = Helpers.createButton("Save title");
-        titleButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SetPanel gauge = (SetPanel) context
-                        .getGauge(selectedGaugeLabel.getText().trim());
-                context.editGaugeTitle(gauge.getTitle(), titleTextField.getText().trim());
-                selectedGaugeLabel.setText(titleTextField.getText().trim());
-
-            }
-
+        titleButton.addActionListener((ActionEvent e) -> {
+            // change title of component
+            SetPanel gauge1 = (SetPanel) context
+                    .getGauge(selectedGaugeLabel.getText().trim());
+            context.editGaugeTitle(gauge1.getTitle(), titleTextField.getText().trim());
+            selectedGaugeLabel.setText(titleTextField.getText().trim());
         });
         container.add(titleButton);
         // </editor-fold>
 
-        // <editor-fold desc="setting up unit of the components for editing">
+        // <editor-fold desc="setting up unit of the components for editing when user selects gauge">
         unitLabel = Helpers.createSmallLabel("Set unit for " + gauge.getTitle());
         unitLabel.setPreferredSize(new Dimension(280, 40));
         container.add(unitLabel);
@@ -423,7 +427,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         });
         container.add(unitButton);
-        
+
         minLimitLabel = Helpers.createSmallLabel("Set minimum for " + gauge.getTitle());
         container.add(minLimitLabel);
 
@@ -437,8 +441,8 @@ public final class Dashboard implements FrameSetup, Runnable {
                 RegularGauge gauge = (RegularGauge) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 try {
-                gauge.setLimitMin(minLimitTextField.getText());
-                } catch(NumberFormatException nfe){
+                    gauge.setLimitMin(minLimitTextField.getText());
+                } catch (NumberFormatException nfe) {
                     notifyNumberConversionError("minimum limit");
                 } catch (IllegalArgumentException ile) {
                     notifyIllegalArgumentError("minimum limit");
@@ -447,7 +451,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         });
         container.add(minLimitButton);
-        
+
         maxLimitLabel = Helpers.createSmallLabel("Set maximum for " + gauge.getTitle());
         container.add(maxLimitLabel);
 
@@ -461,9 +465,8 @@ public final class Dashboard implements FrameSetup, Runnable {
                 RegularGauge gauge = (RegularGauge) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 try {
-                gauge.setLimitMin(maxLimitTextField.getText());
-                } catch (NumberFormatException nfe)
-                {
+                    gauge.setLimitMin(maxLimitTextField.getText());
+                } catch (NumberFormatException nfe) {
                     notifyNumberConversionError("maximum limit");
                 } catch (IllegalArgumentException ile) {
                     notifyIllegalArgumentError("maximum limit");
@@ -472,9 +475,9 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         });
         container.add(maxLimitButton);
-        
+
         // </editor-fold>
-        //rebuild the whole container (EAST)
+        
         c = Helpers.addConstraints(0, 2);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
@@ -483,6 +486,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         rightContainer.add(container, c);
     }
 
+    // add and create both, center and east Containers
     @Override
     public void addComponentsToFrame(Container container) {
 
@@ -500,6 +504,8 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     }
 
+    // run the script, if reading from simulation_script then give feedback 
+    // regarding the flight result
     public void doScriptRunning() throws InterruptedException {
         if (xmlScript.equals(SIMULATION_FILE)) {
             Timer timer = new Timer();
@@ -507,14 +513,17 @@ public final class Dashboard implements FrameSetup, Runnable {
             newThread.start();
             try {
                 if (checkFlightStatus()) {
-                    TimerTask notification = new NotifySimulationResultTimer(mainFrame, "Plane landed successfuly !!", "Congrats", 2);
+                    TimerTask notification = new NotifySimulationResultTimer(mainFrame,
+                            "Plane landed successfuly !!", "Congrats", 2);
                     timer.schedule(notification, 21000);
                 } else {
-                    TimerTask notification = new NotifySimulationResultTimer(mainFrame, "Plane crashed!", "Inane warning", 0);
+                    TimerTask notification = new NotifySimulationResultTimer(mainFrame, "Plane crashed!"
+                            + " Not enough fuel to reach destination.", "Inane warning", 0);
                     timer.schedule(notification, 21000);
                 }
             } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(mainFrame, "One or more values could not be converted", "Error", 0);
+                JOptionPane.showMessageDialog(mainFrame, "One or more values could "
+                        + "not be converted", "Error", 0);
             }
         } else {
             Thread newThread = new Thread(this);
@@ -522,18 +531,37 @@ public final class Dashboard implements FrameSetup, Runnable {
         }
 
     }
-    
-    public void notifyNumberConversionError(String parameter){
-        JOptionPane.showMessageDialog(mainFrame, "Could not convert to number" + parameter
-                            + " format expected", "Error!", 0);
-    }
-    
-    public void notifyIllegalArgumentError(String parameter){
-        JOptionPane.showMessageDialog(mainFrame, "The value passed for " 
-                + parameter + " could not be set"
-                , "Error!", 0);
+
+    // show error message for NumberFormatException
+    public void notifyNumberConversionError(String parameter) {
+        JOptionPane.showMessageDialog(mainFrame, "Could not convert to number " + parameter
+                + " format expected", "Error!", 0);
     }
 
+    // show error message for IllegalArgumentException
+    public void notifyIllegalArgumentError(String parameter) {
+        JOptionPane.showMessageDialog(mainFrame, "The value passed for "
+                + parameter + " could not be set",
+                 "Error!", 0);
+    }
+
+    // rebuild the mainFrame together with resetting the values of the dials
+    public void reinitializeMainFrame() {
+
+        mainFrame.remove(centerContainer);
+        centerContainer.removeAll();
+        context = ContextStorage.getInstance();
+        context.reinitializeGauges();
+        centerContainer = new Container();
+        centerContainer.setLayout(new GridBagLayout());
+
+        addComponentsToMainContainer(centerContainer);
+        mainFrame.revalidate();
+        mainFrame.repaint();
+        mainFrame.add(centerContainer, BorderLayout.CENTER);
+    }
+
+    // build the EAST panel and add all the components needed
     @Override
     public void addComponentToRightContainer(Container container) {
         playSimulationButton = Helpers.createButton("Play Simulation");
@@ -544,23 +572,11 @@ public final class Dashboard implements FrameSetup, Runnable {
         playSimulationButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                mainFrame.remove(centerContainer);
-                centerContainer.removeAll();
-                context = ContextStorage.getInstance();
-                context.reinitializeGauges();
-                centerContainer = new Container();
-                centerContainer.setLayout(new GridBagLayout());
-
-                addComponentsToMainContainer(centerContainer);
-                mainFrame.revalidate();
-                mainFrame.repaint();
-                mainFrame.add(centerContainer, BorderLayout.CENTER);
-
+                // show the input Panel for simulation
+                reinitializeMainFrame();
                 createSimulationInputPanel();
                 trafficLight.getGauge().setRedOn(true);
                 xmlScript = SIMULATION_FILE;
-
             }
 
         });
@@ -568,18 +584,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         setGaugesValuesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                centerContainer.removeAll();
-                mainFrame.remove(centerContainer);
-                context = ContextStorage.getInstance();
-                context.reinitializeGauges();
-                centerContainer = new Container();
-                centerContainer.setLayout(new GridBagLayout());
-
-                addComponentsToMainContainer(centerContainer);
-                mainFrame.revalidate();
-                mainFrame.repaint();
-                mainFrame.add(centerContainer, BorderLayout.CENTER);
+                // execute dasboard_script.xml to set dials values by reading from script
+                reinitializeMainFrame();
                 trafficLight.getGauge().setRedOn(true);
                 if (editPanel != null) {
                     rightContainer.remove(editPanel);
@@ -592,7 +598,6 @@ public final class Dashboard implements FrameSetup, Runnable {
                 if (simulationInputsPanel != null) {
                     rightContainer.remove(simulationInputsPanel);
                 }
-
                 xmlScript = SETGAUGES_SCRIPT;
                 try {
                     doScriptRunning();
@@ -608,6 +613,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         topRightPanel.add(playSimulationButton);
         topRightPanel.add(setGaugesValuesButton);
+        
         selectedGaugeLabel = Helpers.createLabel("Selected Gauge");
         selectedGaugeLabel.setPreferredSize(new Dimension(240, 40));
         c = Helpers.addConstraints(0, 0, 1.0, 0.8);
@@ -620,17 +626,15 @@ public final class Dashboard implements FrameSetup, Runnable {
         gaugeValuePanel.add(selectedGaugeValueText, c);
 
         selectedGaugeValueButton = Helpers.createButton("Save value");
-        selectedGaugeValueButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                double newValue = Double.parseDouble(selectedGaugeValueText.getText());
-                GaugeSetup gauge = (GaugeSetup) context
-                        .getGauge(selectedGaugeLabel.getText().trim());
-                if (gauge != null) {
-                    UpdateGaugeThread updateThread
-                            = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
-                    updateThread.start();
-                }
+        selectedGaugeValueButton.addActionListener((ActionEvent e) -> {
+            // set the value of the currently selected dial
+            double newValue = Double.parseDouble(selectedGaugeValueText.getText());
+            GaugeSetup gauge = (GaugeSetup) context
+                    .getGauge(selectedGaugeLabel.getText().trim());
+            if (gauge != null) {
+                UpdateGaugeThread updateThread
+                        = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
+                updateThread.start();
             }
         });
         c.gridx = 0;
@@ -649,7 +653,11 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     }
 
+    // bottom Panel on the right hand side for inputting values for gauges
+    // when running the simulation
     public void createSimulationInputPanel() {
+
+        // JLabels for simulation
         playAirPressureLabel = Helpers.createSmallLabel("Air Pressure Value");
         playFuelLabel = Helpers.createSmallLabel("Fuel Value");
         playSpeedLabel = Helpers.createSmallLabel("Speed Value");
@@ -658,6 +666,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         playWindDirectionLabel.setPreferredSize(new Dimension(220, 30));
         distanceLabel = Helpers.createSmallLabel("Flight Distance (km)");
 
+        // <editor-fold desc="create Text fields and add input listeners for each">
         playAirPressureText = Helpers.createTextField("");
         DocumentListener airPressureListener = new AirPressureValueListener();
         playAirPressureText.getDocument().addDocumentListener(airPressureListener);
@@ -679,6 +688,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         playWindDirectionText.getDocument().addDocumentListener(windDirectionListener);
 
         distanceText = Helpers.createTextField("");
+
+        // </editor-fold>
         if (simulationInputsPanel != null) {
             rightContainer.remove(simulationInputsPanel);
         }
@@ -688,6 +699,7 @@ public final class Dashboard implements FrameSetup, Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                // prepare for running the simulation with preset values
                 windDir.getGauge().setValue(40);
                 fuel.getGauge().setValue(90);
                 speed.getGauge().setValue(0);
@@ -711,6 +723,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         simulationInputsPanel.setLayout(new BoxLayout(simulationInputsPanel, BoxLayout.Y_AXIS));
         simulationInputsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // <editor-fold desc="add all the created components to the simulationInputPanel">
         simulationInputsPanel.add(playAirPressureLabel);
         simulationInputsPanel.add(playAirPressureText);
         simulationInputsPanel.add(playSpeedLabel);
@@ -726,6 +739,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         simulationInputsPanel.add(Helpers.createSeparatorYaxis());
         simulationInputsPanel.add(runSimulationButton);
 
+        // </editor-fold>
         c.gridx = 0;
         c.gridy = 2;
         c.anchor = GridBagConstraints.PAGE_START;
@@ -743,6 +757,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         }
     }
 
+    // do some calculations using speed, distance and fuel to see whether
+    // the plane will succesfully take off and land or crash
     public boolean checkFlightStatus() throws NumberFormatException {
         double fuelValue;
         double distanceValue;
@@ -754,6 +770,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         double consumePerKm;
 
+        // based on speed calculate fuel consume per hour
         if (speedValue < 55) {
             consumePerKm = 1;
         } else {
@@ -762,6 +779,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         double distancePossible = fuelValue / consumePerKm;
 
+        // if distance is reachable return true, else false
         if (distancePossible >= distanceValue) {
             return true;
         } else {
@@ -770,51 +788,14 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     }
 
-    public void setSpeed() {
-        try {
-            int value = Integer.parseInt(playSpeedText.getText().trim());
-            speed.getGauge().setValue(value);
-        } catch (NumberFormatException e) {
-        }
-        // don't set the speed if the input can't be parsed
+    // run method when local thread is started
+    @Override
+    public void run() {
+        runPresetValuesXML();
+
     }
 
-    public void setFuel() {
-        try {
-            int value = Integer.parseInt(playFuelText.getText().trim());
-            fuel.getGauge().setValue(value);
-        } catch (NumberFormatException e) {
-        }
-        // don't set the speed if the input can't be parsed
-    }
-
-    public void setAirPressure() {
-        try {
-            int value = Integer.parseInt(playAirPressureText.getText().trim());
-            airPressure.getGauge().setValue(value);
-        } catch (NumberFormatException e) {
-        }
-        // don't set the speed if the input can't be parsed
-    }
-
-    public void setTemperature() {
-        try {
-            int value = Integer.parseInt(playTemperatureText.getText().trim());
-            temperature.getGauge().setValue(value);
-        } catch (NumberFormatException e) {
-        }
-        // don't set the speed if the input can't be parsed
-    }
-
-    public void setWindDirection() {
-        try {
-            int value = Integer.parseInt(playWindDirectionText.getText().trim());
-            windDir.getGauge().setValue(value);
-        } catch (NumberFormatException e) {
-        }
-        // don't set the speed if the input can't be parsed
-    }
-
+    // <editor-fold desc="little changes to the runXMLScript method provided in DashboardDemoProject example">
     /**
      * Run the XML script file which generates events for the dashboard
      * indicators
@@ -824,57 +805,42 @@ public final class Dashboard implements FrameSetup, Runnable {
             DashboardEventGeneratorFromXML dbegXML = new DashboardEventGeneratorFromXML();
 
             // Register for speed events from the XML script file
-            DashBoardEventListener dbelSpeed = new DashBoardEventListener() {
-                @Override
-                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
-                    UpdateGaugeThread speedThread = new UpdateGaugeThread(speed.getGauge(),
-                            Double.parseDouble(dbe.getValue()));
-                    speedThread.start();
-                }
+            DashBoardEventListener dbelSpeed = (Object originator, DashBoardEvent dbe) -> {
+                UpdateGaugeThread speedThread = new UpdateGaugeThread(speed.getGauge(),
+                        Double.parseDouble(dbe.getValue()));
+                speedThread.start();
             };
             dbegXML.registerDashBoardEventListener("speed", dbelSpeed);
 
             // Register for airPressure events from the XML script file
-            DashBoardEventListener dbelAirPressure = new DashBoardEventListener() {
-                @Override
-                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
-                    Thread speedThread = new ScriptGaugeThread(airPressure.getGauge(),
-                            Double.parseDouble(dbe.getValue()));
-                    speedThread.start();
-                }
+            DashBoardEventListener dbelAirPressure = (Object originator, DashBoardEvent dbe) -> {
+                Thread speedThread = new ScriptGaugeThread(airPressure.getGauge(),
+                        Double.parseDouble(dbe.getValue()));
+                speedThread.start();
             };
             dbegXML.registerDashBoardEventListener("airPressure", dbelAirPressure);
 
             // Register for fuel events from the XML script file
-            DashBoardEventListener dbelFuel = new DashBoardEventListener() {
-                @Override
-                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
-                    Thread fuelThread = new Thread(new SlowValueThread(fuel.getGauge(),
-                            Double.parseDouble(dbe.getValue())));
-                    fuelThread.start();
-                }
+            DashBoardEventListener dbelFuel = (Object originator, DashBoardEvent dbe) -> {
+                Thread fuelThread = new Thread(new SlowValueThread(fuel.getGauge(),
+                        Double.parseDouble(dbe.getValue())));
+                fuelThread.start();
             };
             dbegXML.registerDashBoardEventListener("fuel", dbelFuel);
 
             // Register for wind direction events from the XML script file
-            DashBoardEventListener dbelWindDirection = new DashBoardEventListener() {
-                @Override
-                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
-                    ScriptGaugeThread speedThread = new ScriptGaugeThread(windDir.getGauge(),
-                            Double.parseDouble(dbe.getValue()));
-                    speedThread.start();
-                }
+            DashBoardEventListener dbelWindDirection = (Object originator, DashBoardEvent dbe) -> {
+                ScriptGaugeThread speedThread = new ScriptGaugeThread(windDir.getGauge(),
+                        Double.parseDouble(dbe.getValue()));
+                speedThread.start();
             };
             dbegXML.registerDashBoardEventListener("windDirection", dbelWindDirection);
 
             // Register for temperature events from the XML script file
-            DashBoardEventListener dbelTemperature = new DashBoardEventListener() {
-                @Override
-                public void processDashBoardEvent(Object originator, DashBoardEvent dbe) {
-                    Thread temperatureThread = new Thread(new ScriptGaugeThread(temperature.getGauge(),
-                            Double.parseDouble(dbe.getValue())));
-                    temperatureThread.start();
-                }
+            DashBoardEventListener dbelTemperature = (Object originator, DashBoardEvent dbe) -> {
+                Thread temperatureThread = new Thread(new ScriptGaugeThread(temperature.getGauge(),
+                        Double.parseDouble(dbe.getValue())));
+                temperatureThread.start();
             };
             dbegXML.registerDashBoardEventListener("temperature", dbelTemperature);
 
@@ -885,11 +851,47 @@ public final class Dashboard implements FrameSetup, Runnable {
             Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    // </editor-fold>
 
-    @Override
-    public void run() {
-        runPresetValuesXML();
+    // <editor-fold desc="using DashboardDemProject as example for setting up dials values">
+    public void setSpeed() {
+        try {
+            int value = Integer.parseInt(playSpeedText.getText().trim());
+            speed.getGauge().setValue(value);
+        } catch (NumberFormatException e) {
+        }
+    }
 
+    public void setFuel() {
+        try {
+            int value = Integer.parseInt(playFuelText.getText().trim());
+            fuel.getGauge().setValue(value);
+        } catch (NumberFormatException e) {
+        }
+    }
+
+    public void setAirPressure() {
+        try {
+            int value = Integer.parseInt(playAirPressureText.getText().trim());
+            airPressure.getGauge().setValue(value);
+        } catch (NumberFormatException e) {
+        }
+    }
+
+    public void setTemperature() {
+        try {
+            int value = Integer.parseInt(playTemperatureText.getText().trim());
+            temperature.getGauge().setValue(value);
+        } catch (NumberFormatException e) {
+        }
+    }
+
+    public void setWindDirection() {
+        try {
+            int value = Integer.parseInt(playWindDirectionText.getText().trim());
+            windDir.getGauge().setValue(value);
+        } catch (NumberFormatException e) {
+        }
     }
 
     private class SpeedValueListener implements DocumentListener {
@@ -982,9 +984,10 @@ public final class Dashboard implements FrameSetup, Runnable {
         }
     }
 
+    // </editor-fold>
     //main method to run application
     public static void main(String[] args) {
-        Dashboard me = new Dashboard();
+        Dashboard dashboard = new Dashboard();
     }
 
 }

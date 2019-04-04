@@ -1,4 +1,4 @@
-package dashboard;
+package DesignPatterns;
 
 import java.awt.Component;
 import java.awt.Dimension;

@@ -1,4 +1,4 @@
-package UIClasses;
+package UIClassesForGauges;
 
 import dashboard.InvalidLimitsException;
 import eu.hansolo.steelseries.tools.Section;

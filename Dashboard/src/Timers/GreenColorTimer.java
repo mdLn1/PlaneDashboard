@@ -1,22 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package Threading;
+package Timers;
 
 import eu.hansolo.steelseries.extras.TrafficLight;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author cp3526m
- */
 public class GreenColorTimer extends TimerTask{
 
-    private TrafficLight trafficLight;
+    private final TrafficLight trafficLight;
     
     public GreenColorTimer(TrafficLight trafficLight){
         this.trafficLight = trafficLight;
@@ -24,7 +15,7 @@ public class GreenColorTimer extends TimerTask{
     
     @Override
     public void run() {
-        
+        // do the simulation for the traffic light on take off
         try {
         trafficLight.setRedOn(false);
         trafficLight.setGreenOn(true);
