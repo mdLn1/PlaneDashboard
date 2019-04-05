@@ -275,6 +275,8 @@ public final class Dashboard implements FrameSetup, Runnable {
                     } catch (InvalidLimitsException ile) {
                         dangerMinText.setText(gauge.getDangerZoneMin() + "");
                         JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
+                    } catch (NumberFormatException infe){
+                        notifyNumberConversionError("danger minimum");
                     }
                 }
 
@@ -300,6 +302,8 @@ public final class Dashboard implements FrameSetup, Runnable {
                     } catch (InvalidLimitsException ile) {
                         dangerMaxText.setText(gauge.getDangerZoneMax() + "");
                         JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
+                    }catch (NumberFormatException infe){
+                        notifyNumberConversionError("danger maximum");
                     }
                 }
 
@@ -322,6 +326,8 @@ public final class Dashboard implements FrameSetup, Runnable {
                         dangerMinText.setText(gauge.getDangerZoneMin() + "");
                         dangerMaxText.setText(gauge.getDangerZoneMax() + "");
                         JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
+                    } catch (NumberFormatException infe){
+                        notifyNumberConversionError("danger minimum or maximum");
                     }
 
                 }
@@ -629,7 +635,13 @@ public final class Dashboard implements FrameSetup, Runnable {
         selectedGaugeValueButton.addActionListener((ActionEvent e) -> {
             // set the value of the currently selected dial
             ContextStorage context = ContextStorage.getInstance();
-            double newValue = Double.parseDouble(selectedGaugeValueText.getText());
+            double newValue = 0.0;
+            try {
+                newValue = Double.parseDouble(selectedGaugeValueText.getText());
+            } catch (NumberFormatException npe){
+                notifyNumberConversionError(selectedGaugeLabel.getText().trim() + " value");
+                return;
+            }
             GaugeSetup gauge = (GaugeSetup) context
                     .getGauge(selectedGaugeLabel.getText().trim());
             if (gauge != null && gauge.getGauge().getMinValue() < newValue &&
