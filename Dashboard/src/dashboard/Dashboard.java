@@ -7,6 +7,7 @@ import Threading.SlowValueThread;
 import Threading.UpdateGaugeThread;
 import Timers.GreenColorTimer;
 import Interfaces.FrameSetup;
+import Interfaces.GaugeAttributes;
 import Interfaces.SetPanel;
 import Timers.NotifySimulationResultTimer;
 import UIClassesForGauges.TrafficLightSetup;
@@ -420,9 +421,9 @@ public final class Dashboard implements FrameSetup, Runnable {
         unitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegularGauge gauge = (RegularGauge) context
+                GaugeAttributes gauge = (GaugeAttributes) context
                         .getGauge(selectedGaugeLabel.getText().trim());
-                gauge.getGauge().setUnitString(unitTextField.getText());
+                gauge.setUnit(unitTextField.getText());
             }
 
         });
@@ -438,7 +439,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         minLimitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegularGauge gauge = (RegularGauge) context
+                GaugeAttributes gauge = (GaugeAttributes) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 try {
                     gauge.setLimitMin(minLimitTextField.getText());
@@ -462,10 +463,10 @@ public final class Dashboard implements FrameSetup, Runnable {
         maxLimitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegularGauge gauge = (RegularGauge) context
+                GaugeAttributes gauge = (GaugeAttributes) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 try {
-                    gauge.setLimitMin(maxLimitTextField.getText());
+                    gauge.setLimitMax(maxLimitTextField.getText());
                 } catch (NumberFormatException nfe) {
                     notifyNumberConversionError("maximum limit");
                 } catch (IllegalArgumentException ile) {
@@ -631,10 +632,15 @@ public final class Dashboard implements FrameSetup, Runnable {
             double newValue = Double.parseDouble(selectedGaugeValueText.getText());
             GaugeSetup gauge = (GaugeSetup) context
                     .getGauge(selectedGaugeLabel.getText().trim());
-            if (gauge != null) {
+            if (gauge != null && gauge.getGauge().getMinValue() < newValue &&
+                    gauge.getGauge().getMaxValue() > newValue) {
                 UpdateGaugeThread updateThread
                         = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
                 updateThread.start();
+            } else
+            {
+                JOptionPane.showMessageDialog(mainFrame, "Could not set the "
+                        + "given value", "Error!", 0);
             }
         });
         c.gridx = 0;
