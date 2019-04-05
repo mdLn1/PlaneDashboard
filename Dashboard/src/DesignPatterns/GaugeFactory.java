@@ -30,7 +30,7 @@ public class GaugeFactory {
     }
 
     // based on the required type, if found return an initialised JComponent
-    public static JComponent createRadialGauge(String type) {
+    public static JComponent createDial(String type) {
         try {
             if (savedGauges.containsKey(type)) {
                 Class theClass = (Class) savedGauges.get(type);
@@ -43,6 +43,5 @@ public class GaugeFactory {
             return null;
         }
     }
-
     
 }

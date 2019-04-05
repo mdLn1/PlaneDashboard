@@ -5,11 +5,11 @@ import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class GreenColorTimer extends TimerTask{
+public class GreenColorTimerTask extends TimerTask{
 
     private final TrafficLight trafficLight;
     
-    public GreenColorTimer(TrafficLight trafficLight){
+    public GreenColorTimerTask(TrafficLight trafficLight){
         this.trafficLight = trafficLight;
     }
     
@@ -22,7 +22,7 @@ public class GreenColorTimer extends TimerTask{
         trafficLight.setYellowBlinking(false);
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            Logger.getLogger(GreenColorTimer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GreenColorTimerTask.class.getName()).log(Level.SEVERE, null, ex);
         } finally{
             trafficLight.setGreenOn(false);
         }

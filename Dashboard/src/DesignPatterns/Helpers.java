@@ -8,9 +8,11 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+// servant pattern to provide with general UI components building methods
+// also contains constants
 public final class Helpers {
     
-    public static final String SIMPLER_RADIAL = "Simple Radial";
+    public static final String SIMPLE_RADIAL = "Simple Radial";
     public static final String HALF_DIAL = "Half Dial";
     public static final String QUARTER_DIAL = "Quarter Dial";
     public static final String LINEAR_BAR = "VerticalBar";

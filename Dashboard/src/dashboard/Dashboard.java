@@ -5,11 +5,11 @@ import DesignPatterns.ContextStorage;
 import Threading.ScriptGaugeThread;
 import Threading.SlowValueThread;
 import Threading.UpdateGaugeThread;
-import Timers.GreenColorTimer;
+import Timers.GreenColorTimerTask;
 import Interfaces.FrameSetup;
 import Interfaces.GaugeAttributes;
 import Interfaces.SetPanel;
-import Timers.NotifySimulationResultTimer;
+import Timers.NotifySimulationResultTimerTask;
 import UIClassesForGauges.TrafficLightSetup;
 import UIClassesForGauges.RegularGauge;
 import UIClassesForGauges.SpecialisedGauge;
@@ -47,8 +47,6 @@ import uk.ac.gre.comp1549.dashboard.scriptreader.DashboardEventGeneratorFromXML;
 
 public final class Dashboard implements FrameSetup, Runnable {
 
-    // singleton class
-    private ContextStorage context;
 
     public static final String SETGAUGES_SCRIPT = "dashboard_script.xml";
     public static final String SIMULATION_FILE = "simulation_script.xml";
@@ -156,8 +154,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         mainFrame.setLayout(new BorderLayout());
 
         // </editor-fold>
-        context = ContextStorage.getInstance();
-
+        
         addComponentsToFrame(mainFrame.getContentPane());
 
         mainFrame.pack();
@@ -168,7 +165,7 @@ public final class Dashboard implements FrameSetup, Runnable {
     @Override
     public void addComponentsToMainContainer(Container container) {
 
-        context = ContextStorage.getInstance();
+        ContextStorage context = ContextStorage.getInstance();
         // <editor-fold desc="create gauges and add them to ContextStorage singleton class">
         windDir = new RegularGauge("Wind Direction", Helpers.DIRECTION_DIAL, "Km/h");
         GridBagConstraints c = new GridBagConstraints();
@@ -179,7 +176,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         airPressure = new RegularGauge("Air Pressure", Helpers.HALF_DIAL, "mmHg");
         context.addGauge(airPressure, new PairHeads(1, 0));
 
-        speed = new SpecialisedGauge("Speed", Helpers.SIMPLER_RADIAL, "Km/h");
+        speed = new SpecialisedGauge("Speed", Helpers.SIMPLE_RADIAL, "Km/h");
         context.addGauge(speed, new PairHeads(2, 0));
 
         temperature = new SpecialisedGauge("Temperature", Helpers.LINEAR_BAR, "Celsius");
@@ -266,7 +263,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
             dangerMinText = Helpers.createTextField(specialGauge.getDangerZoneMin() + "");
             editPanel.add(dangerMinText);
-
+            ContextStorage context = ContextStorage.getInstance();
             dangerMinButton = Helpers.createButton("Save minimum");
             dangerMinButton.addActionListener(new ActionListener() {
                 @Override
@@ -397,10 +394,11 @@ public final class Dashboard implements FrameSetup, Runnable {
         titleTextField = Helpers.createTextField(gauge.getTitle());
 
         container.add(titleTextField);
-
+        
         titleButton = Helpers.createButton("Save title");
         titleButton.addActionListener((ActionEvent e) -> {
             // change title of component
+            ContextStorage context = ContextStorage.getInstance();
             SetPanel gauge1 = (SetPanel) context
                     .getGauge(selectedGaugeLabel.getText().trim());
             context.editGaugeTitle(gauge1.getTitle(), titleTextField.getText().trim());
@@ -421,6 +419,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         unitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // setting unit for a dial
+                ContextStorage context = ContextStorage.getInstance();
                 GaugeAttributes gauge = (GaugeAttributes) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 gauge.setUnit(unitTextField.getText());
@@ -439,6 +439,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         minLimitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // setting min limit for a dial
+                ContextStorage context = ContextStorage.getInstance();
                 GaugeAttributes gauge = (GaugeAttributes) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 try {
@@ -463,6 +465,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         maxLimitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // setting maxLimit for a dial
+                ContextStorage context = ContextStorage.getInstance();
                 GaugeAttributes gauge = (GaugeAttributes) context
                         .getGauge(selectedGaugeLabel.getText().trim());
                 try {
@@ -512,20 +516,15 @@ public final class Dashboard implements FrameSetup, Runnable {
             Timer timer = new Timer();
             Thread newThread = new Thread(this);
             newThread.start();
-            try {
                 if (checkFlightStatus()) {
-                    TimerTask notification = new NotifySimulationResultTimer(mainFrame,
+                    TimerTask notification = new NotifySimulationResultTimerTask(mainFrame,
                             "Plane landed successfuly !!", "Congrats", 2);
                     timer.schedule(notification, 21000);
                 } else {
-                    TimerTask notification = new NotifySimulationResultTimer(mainFrame, "Plane crashed!"
+                    TimerTask notification = new NotifySimulationResultTimerTask(mainFrame, "Plane crashed!"
                             + " Not enough fuel to reach destination.", "Inane warning", 0);
                     timer.schedule(notification, 21000);
                 }
-            } catch (NumberFormatException nfe) {
-                JOptionPane.showMessageDialog(mainFrame, "One or more values could "
-                        + "not be converted", "Error", 0);
-            }
         } else {
             Thread newThread = new Thread(this);
             newThread.start();
@@ -548,10 +547,10 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     // rebuild the mainFrame together with resetting the values of the dials
     public void reinitializeMainFrame() {
-
+        
         mainFrame.remove(centerContainer);
         centerContainer.removeAll();
-        context = ContextStorage.getInstance();
+        ContextStorage context = ContextStorage.getInstance();
         context.reinitializeGauges();
         centerContainer = new Container();
         centerContainer.setLayout(new GridBagLayout());
@@ -629,6 +628,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         selectedGaugeValueButton = Helpers.createButton("Save value");
         selectedGaugeValueButton.addActionListener((ActionEvent e) -> {
             // set the value of the currently selected dial
+            ContextStorage context = ContextStorage.getInstance();
             double newValue = Double.parseDouble(selectedGaugeValueText.getText());
             GaugeSetup gauge = (GaugeSetup) context
                     .getGauge(selectedGaugeLabel.getText().trim());
@@ -706,13 +706,25 @@ public final class Dashboard implements FrameSetup, Runnable {
             public void actionPerformed(ActionEvent e) {
 
                 // prepare for running the simulation with preset values
+                try {
+                     Double.parseDouble(playAirPressureText.getText());
+                     Double.parseDouble(playSpeedText.getText());
+                     Double.parseDouble(playFuelText.getText());
+                     Double.parseDouble(playTemperatureText.getText());
+                     Double.parseDouble(playWindDirectionText.getText());
+                     Double.parseDouble(distanceText.getText());
+                }catch (IllegalArgumentException | NullPointerException ex){
+                     JOptionPane.showMessageDialog(mainFrame, "One or more values could "
+                        + "not be converted", "Error", 0);
+                     return;
+                }
                 windDir.getGauge().setValue(40);
                 fuel.getGauge().setValue(90);
                 speed.getGauge().setValue(0);
                 trafficLight.getGauge().setRedOn(true);
                 trafficLight.getGauge().setYellowBlinking(true);
                 Timer timer = new Timer();
-                TimerTask timerTask = new GreenColorTimer(trafficLight.getGauge());
+                TimerTask timerTask = new GreenColorTimerTask(trafficLight.getGauge());
                 timer.schedule(timerTask, 4000);
                 try {
                     doScriptRunning();

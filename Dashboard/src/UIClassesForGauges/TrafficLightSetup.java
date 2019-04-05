@@ -42,7 +42,7 @@ public class TrafficLightSetup extends JPanel implements SetPanel {
         
         gaugeName = Helpers.createLabel(name);
         gaugeName.setAlignmentX(LEFT_ALIGNMENT);
-        gauge = (TrafficLight) GaugeFactory.createRadialGauge(type);
+        gauge = (TrafficLight) GaugeFactory.createDial(type);
         gauge.setPreferredSize(new Dimension(300,300));
         title = name;
         setTitle(name);

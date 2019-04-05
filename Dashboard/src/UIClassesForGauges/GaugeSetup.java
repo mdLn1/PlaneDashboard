@@ -52,7 +52,7 @@ public class GaugeSetup extends JPanel implements SetPanel{
         
         gaugeName = Helpers.createLabel(name);
         
-        gauge = (AbstractGauge) GaugeFactory.createRadialGauge(type);
+        gauge = (AbstractGauge) GaugeFactory.createDial(type);
         
         // if the mentioned type is not found, call initialise empty panel
         if (gauge == null)

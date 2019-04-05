@@ -1,5 +1,7 @@
 package dashboard;
 
+// class that stores a pair of values which can be
+// considered limits as field names suggest
 public final class PairHeads {
     
     int start;

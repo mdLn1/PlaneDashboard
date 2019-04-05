@@ -11,10 +11,10 @@ package dashboard;
  */
 public class InvalidLimitsException extends Exception {
         
-    double min;
-    double max;
-    double maxLimit;
-    double minLimit;
+    private final double min;
+    private final double max;
+    private final double maxLimit;
+    private final double minLimit;
     
     
     public InvalidLimitsException(double min, double max, double minLimit, double maxLimit) {

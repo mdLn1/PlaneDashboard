@@ -1,14 +1,14 @@
-package parameterscalculator;
+package anythingconverter;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
-public class calculator extends javax.swing.JPanel {
+public class Converter extends javax.swing.JPanel {
 
     private double SCALE = 1.0;
     NumberFormat formatter = new DecimalFormat("#0.##");
     
-    public calculator() {
+    public Converter() {
         initComponents();
     }
     
