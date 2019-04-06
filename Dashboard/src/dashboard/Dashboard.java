@@ -10,10 +10,10 @@ import Interfaces.FrameSetup;
 import Interfaces.GaugeAttributes;
 import Interfaces.SetPanel;
 import Timers.NotifySimulationResultTimerTask;
-import UIClassesForGauges.TrafficLightSetup;
+import UIClassesForGauges.TrafficLightPanel;
 import UIClassesForGauges.RegularGauge;
 import UIClassesForGauges.SpecialisedGauge;
-import UIClassesForGauges.GaugeSetup;
+import UIClassesForGauges.GaugePanel;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;
@@ -47,7 +47,6 @@ import uk.ac.gre.comp1549.dashboard.scriptreader.DashboardEventGeneratorFromXML;
 
 public final class Dashboard implements FrameSetup, Runnable {
 
-
     public static final String SETGAUGES_SCRIPT = "dashboard_script.xml";
     public static final String SIMULATION_FILE = "simulation_script.xml";
     private String xmlScript = SETGAUGES_SCRIPT;
@@ -63,7 +62,7 @@ public final class Dashboard implements FrameSetup, Runnable {
     private SpecialisedGauge speed;
     private SpecialisedGauge temperature;
     private RegularGauge fuel;
-    private TrafficLightSetup trafficLight;
+    private TrafficLightPanel trafficLight;
 
     // </editor-fold>
     // <editor-fold desc="rightContainer JComponents">
@@ -136,7 +135,6 @@ public final class Dashboard implements FrameSetup, Runnable {
     // </editor-fold>
 
     // </editor-fold>
-    
     // constructor
     public Dashboard() {
         createGUI();
@@ -154,7 +152,6 @@ public final class Dashboard implements FrameSetup, Runnable {
         mainFrame.setLayout(new BorderLayout());
 
         // </editor-fold>
-        
         addComponentsToFrame(mainFrame.getContentPane());
 
         mainFrame.pack();
@@ -184,14 +181,13 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         fuel = new RegularGauge("Fuel", Helpers.QUARTER_DIAL, "hectoL");
         context.addGauge(fuel, new PairHeads(1, 1));
-        
 
-        trafficLight = new TrafficLightSetup("Traffic Light", "Traffic Light");
+        trafficLight = new TrafficLightPanel("Traffic Light", "Traffic Light");
 
         trafficLight.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                adjustRightContainer((TrafficLightSetup) trafficLight);
+                adjustRightContainer((TrafficLightPanel) trafficLight);
             }
 
         });
@@ -200,9 +196,8 @@ public final class Dashboard implements FrameSetup, Runnable {
         c.gridy = 1;
 
         container.add(trafficLight, c);
-        
+
         // </editor-fold>
-        
         // <editor-fold desc="add mouse listener for every gauge + add every gauge to the main container">
         for (Map.Entry<Object, PairHeads> g : context.getGauges().entrySet()) {
             JComponent tempGauge = (JComponent) g.getKey();
@@ -215,7 +210,7 @@ public final class Dashboard implements FrameSetup, Runnable {
                 }
 
             });
-            if (g.getKey() instanceof GaugeSetup) {
+            if (g.getKey() instanceof GaugePanel) {
                 //SetPanel sp = (SetPanel) g.getKey();
                 PairHeads positions = context.getConstraints(g.getKey());
                 c.gridx = positions.getStart();
@@ -275,7 +270,7 @@ public final class Dashboard implements FrameSetup, Runnable {
                     } catch (InvalidLimitsException ile) {
                         dangerMinText.setText(gauge.getDangerZoneMin() + "");
                         JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
-                    } catch (NumberFormatException infe){
+                    } catch (NumberFormatException infe) {
                         notifyNumberConversionError("danger minimum");
                     }
                 }
@@ -302,7 +297,7 @@ public final class Dashboard implements FrameSetup, Runnable {
                     } catch (InvalidLimitsException ile) {
                         dangerMaxText.setText(gauge.getDangerZoneMax() + "");
                         JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
-                    }catch (NumberFormatException infe){
+                    } catch (NumberFormatException infe) {
                         notifyNumberConversionError("danger maximum");
                     }
                 }
@@ -326,7 +321,7 @@ public final class Dashboard implements FrameSetup, Runnable {
                         dangerMinText.setText(gauge.getDangerZoneMin() + "");
                         dangerMaxText.setText(gauge.getDangerZoneMax() + "");
                         JOptionPane.showMessageDialog(mainFrame, ile.toString(), "Error", 0);
-                    } catch (NumberFormatException infe){
+                    } catch (NumberFormatException infe) {
                         notifyNumberConversionError("danger minimum or maximum");
                     }
 
@@ -341,9 +336,9 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         } else if (gauge instanceof RegularGauge) {
             createRegularFormInput((RegularGauge) gauge, editPanel);
-        } else if (gauge instanceof TrafficLightSetup) {
+        } else if (gauge instanceof TrafficLightPanel) {
             // <editor-fold  desc="build the editing panel for traffic lights">
-            TrafficLightSetup traffic = (TrafficLightSetup) gauge;
+            TrafficLightPanel traffic = (TrafficLightPanel) gauge;
             editPanel.add(Helpers.createSeparatorYaxis());
 
             redLightCheckBox = new JCheckBox("Red Light", traffic.getGauge().isRedOn());
@@ -400,7 +395,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         titleTextField = Helpers.createTextField(gauge.getTitle());
 
         container.add(titleTextField);
-        
+
         titleButton = Helpers.createButton("Save title");
         titleButton.addActionListener((ActionEvent e) -> {
             // change title of component
@@ -488,7 +483,6 @@ public final class Dashboard implements FrameSetup, Runnable {
         container.add(maxLimitButton);
 
         // </editor-fold>
-        
         c = Helpers.addConstraints(0, 2);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.anchor = GridBagConstraints.PAGE_START;
@@ -522,15 +516,15 @@ public final class Dashboard implements FrameSetup, Runnable {
             Timer timer = new Timer();
             Thread newThread = new Thread(this);
             newThread.start();
-                if (checkFlightStatus()) {
-                    TimerTask notification = new NotifySimulationResultTimerTask(mainFrame,
-                            "Plane landed successfuly !!", "Congrats", 2);
-                    timer.schedule(notification, 21000);
-                } else {
-                    TimerTask notification = new NotifySimulationResultTimerTask(mainFrame, "Plane crashed!"
-                            + " Not enough fuel to reach destination.", "Inane warning", 0);
-                    timer.schedule(notification, 21000);
-                }
+            if (checkFlightStatus()) {
+                TimerTask notification = new NotifySimulationResultTimerTask(mainFrame,
+                        "Plane landed successfully !!", "Success", 2);
+                timer.schedule(notification, 21000);
+            } else {
+                TimerTask notification = new NotifySimulationResultTimerTask(mainFrame, "Plane crashed!"
+                        + " Not enough fuel to reach destination.", "Failure", 0);
+                timer.schedule(notification, 21000);
+            }
         } else {
             Thread newThread = new Thread(this);
             newThread.start();
@@ -541,19 +535,19 @@ public final class Dashboard implements FrameSetup, Runnable {
     // show error message for NumberFormatException
     public void notifyNumberConversionError(String parameter) {
         JOptionPane.showMessageDialog(mainFrame, "Could not convert to number " + parameter
-                + " format expected", "Error!", 0);
+                , "Error!", 0);
     }
 
     // show error message for IllegalArgumentException
     public void notifyIllegalArgumentError(String parameter) {
         JOptionPane.showMessageDialog(mainFrame, "The value passed for "
                 + parameter + " could not be set",
-                 "Error!", 0);
+                "Error!", 0);
     }
 
     // rebuild the mainFrame together with resetting the values of the dials
     public void reinitializeMainFrame() {
-        
+
         mainFrame.remove(centerContainer);
         centerContainer.removeAll();
         ContextStorage context = ContextStorage.getInstance();
@@ -619,7 +613,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         topRightPanel.add(playSimulationButton);
         topRightPanel.add(setGaugesValuesButton);
-        
+
         selectedGaugeLabel = Helpers.createLabel("Selected Gauge");
         selectedGaugeLabel.setPreferredSize(new Dimension(240, 40));
         c = Helpers.addConstraints(0, 0, 1.0, 0.8);
@@ -636,21 +630,25 @@ public final class Dashboard implements FrameSetup, Runnable {
             // set the value of the currently selected dial
             ContextStorage context = ContextStorage.getInstance();
             double newValue = 0.0;
-            try {
-                newValue = Double.parseDouble(selectedGaugeValueText.getText());
-            } catch (NumberFormatException npe){
-                notifyNumberConversionError(selectedGaugeLabel.getText().trim() + " value");
-                return;
-            }
-            GaugeSetup gauge = (GaugeSetup) context
+
+            GaugePanel gauge = (GaugePanel) context
                     .getGauge(selectedGaugeLabel.getText().trim());
-            if (gauge != null && gauge.getGauge().getMinValue() < newValue &&
-                    gauge.getGauge().getMaxValue() > newValue) {
+            if (gauge != null && gauge.getGauge().getMinValue() < newValue
+                    && gauge.getGauge().getMaxValue() > newValue) {
+                try {
+                    newValue = Double.parseDouble(selectedGaugeValueText.getText());
+                } catch (NumberFormatException npe) {
+                    notifyNumberConversionError(selectedGaugeLabel.getText().trim() + " value");
+                    return;
+                }
                 UpdateGaugeThread updateThread
                         = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
                 updateThread.start();
-            } else
-            {
+            } else if (gauge == null) {
+                JOptionPane.showMessageDialog(mainFrame, "You have not selected any gauge,"
+                        + " please click on one of the dashboard elements.",
+                         "Error!", 0);
+            } else {
                 JOptionPane.showMessageDialog(mainFrame, "Could not set the "
                         + "given value", "Error!", 0);
             }
@@ -719,16 +717,16 @@ public final class Dashboard implements FrameSetup, Runnable {
 
                 // prepare for running the simulation with preset values
                 try {
-                     Double.parseDouble(playAirPressureText.getText());
-                     Double.parseDouble(playSpeedText.getText());
-                     Double.parseDouble(playFuelText.getText());
-                     Double.parseDouble(playTemperatureText.getText());
-                     Double.parseDouble(playWindDirectionText.getText());
-                     Double.parseDouble(distanceText.getText());
-                }catch (IllegalArgumentException | NullPointerException ex){
-                     JOptionPane.showMessageDialog(mainFrame, "One or more values could "
-                        + "not be converted", "Error", 0);
-                     return;
+                    Double.parseDouble(playAirPressureText.getText());
+                    Double.parseDouble(playSpeedText.getText());
+                    Double.parseDouble(playFuelText.getText());
+                    Double.parseDouble(playTemperatureText.getText());
+                    Double.parseDouble(playWindDirectionText.getText());
+                    Double.parseDouble(distanceText.getText());
+                } catch (IllegalArgumentException | NullPointerException ex) {
+                    JOptionPane.showMessageDialog(mainFrame, "One or more values could "
+                            + "not be converted", "Error", 0);
+                    return;
                 }
                 windDir.getGauge().setValue(40);
                 fuel.getGauge().setValue(90);
@@ -796,7 +794,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         fuelValue = Double.parseDouble(playFuelText.getText());
         distanceValue = Double.parseDouble(distanceText.getText());
-        speedValue = Double.parseDouble(distanceText.getText());
+        speedValue = Double.parseDouble(playSpeedText.getText());
 
         double consumePerKm;
 

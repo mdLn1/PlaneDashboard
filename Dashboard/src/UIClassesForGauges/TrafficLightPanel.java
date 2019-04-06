@@ -11,13 +11,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-public class TrafficLightSetup extends JPanel implements SetPanel {
+public class TrafficLightPanel extends JPanel implements SetPanel {
     private String title;
     private TrafficLight gauge;
     private JLabel gaugeName;
     
     
-     public TrafficLightSetup(String name, String type) {
+     public TrafficLightPanel(String name, String type) {
         if (!name.isEmpty() && !type.isEmpty()) {
             buildPanel(name, type);
             
@@ -29,7 +29,7 @@ public class TrafficLightSetup extends JPanel implements SetPanel {
         
     }
     
-    public TrafficLightSetup() {
+    public TrafficLightPanel() {
         initialiseEmptyPanel();
     }
     

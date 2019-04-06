@@ -1,6 +1,6 @@
 package UIClasses;
 
-import UIClassesForGauges.GaugeSetup;
+import UIClassesForGauges.GaugePanel;
 import eu.hansolo.steelseries.extras.WindDirection;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.Radial;
@@ -11,9 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class GaugeSetupTest {
+public class GaugePanelTest {
     
-    public GaugeSetupTest() {//
+    public GaugePanelTest() {//
     }
     
     @BeforeClass
@@ -37,7 +37,7 @@ public class GaugeSetupTest {
     public void testBuildPanel() {
         String name = "Wind";
         String type = "Direction Radial";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.buildPanel(name, type);
         
         assertEquals(instance.getGauge().getClass(), WindDirection.class);
@@ -48,7 +48,7 @@ public class GaugeSetupTest {
     public void testBuildPane1l() {
         String name = "";
         String type = "Direction Radial";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.buildPanel(name, type);
         
         assertEquals(instance.getGauge().getClass(), WindDirection.class);
@@ -59,7 +59,7 @@ public class GaugeSetupTest {
     public void testBuildPane12() {
         String name = "";
         String type = "Direction";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.buildPanel(name, type);
         
         assertEquals(instance.getGauge().getClass(), Radial.class);
@@ -70,7 +70,7 @@ public class GaugeSetupTest {
     public void testBuildPane13() {
         String name = "Wind";
         String type = "";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.buildPanel(name, type);
         assertEquals(instance.getGauge().getClass(), Radial.class);
     }
@@ -80,7 +80,7 @@ public class GaugeSetupTest {
     public void testBuildPane14() {
         String name = null;
         String type = null;
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.buildPanel(name, type);
         
         assertEquals(instance.getGauge().getClass(), Radial.class);
@@ -89,7 +89,7 @@ public class GaugeSetupTest {
     // test method InitialiseEmptyPanel()
     @Test
     public void testInitialiseEmptyPanel() {
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.initialiseEmptyPanel();
         
         assertEquals(instance.getGauge().getClass(), Radial.class);
@@ -99,7 +99,7 @@ public class GaugeSetupTest {
     @Test
     public void testSetGaugeUnit() {
         String unit = "";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.setGaugeUnit(unit);
         assertEquals(unit, "");
     }
@@ -107,7 +107,7 @@ public class GaugeSetupTest {
     @Test
     public void testSetGaugeUnit1() {
         String unit = "123";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.setGaugeUnit(unit);
         assertEquals(unit, "123");
     }
@@ -116,7 +116,7 @@ public class GaugeSetupTest {
     @Test
     public void testSetGaugeUnit2() {
         String unit = null;
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.setGaugeUnit(unit);
         assertEquals(unit, null);
     }
@@ -124,7 +124,7 @@ public class GaugeSetupTest {
     // test getTitle() after creating a simple GaugeSetup
     @Test
     public void testGetTitle() {
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         String expResult = "Default";
         String result = instance.getTitle();
         assertEquals(expResult, result);
@@ -134,7 +134,7 @@ public class GaugeSetupTest {
     @Test
     public void testSetTitle() {
         String title = "title";
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         instance.setTitle(title);
         
         assertEquals(instance.getTitle(), "title");
@@ -143,7 +143,7 @@ public class GaugeSetupTest {
     // test getGauge() when a simple GaugeSetup() is created
     @Test
     public void testGetGauge() {
-        GaugeSetup instance = new GaugeSetup();
+        GaugePanel instance = new GaugePanel();
         AbstractGauge expResult = new Radial();
         AbstractGauge result = instance.getGauge();
         assertEquals(expResult.getClass(), result.getClass());

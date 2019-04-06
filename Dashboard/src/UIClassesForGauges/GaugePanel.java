@@ -12,8 +12,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-// super class for RegularGauge and SpecialisedGauge classess
-public class GaugeSetup extends JPanel implements SetPanel{
+// super class for RegularGauge and SpecialisedGauge classes
+public class GaugePanel extends JPanel implements SetPanel{
 
     // title property
     private String title;
@@ -23,7 +23,7 @@ public class GaugeSetup extends JPanel implements SetPanel{
     AbstractGauge gauge;
 
     // constructor with two parameters
-    public GaugeSetup(String name, String type) {
+    public GaugePanel(String name, String type) {
         // if nothing is passed in the constructor then do the same as the no-parameter constructor
         if (!name.isEmpty() && !type.isEmpty()) {
             name = name.trim();
@@ -38,7 +38,7 @@ public class GaugeSetup extends JPanel implements SetPanel{
     }
     
     // no parameters constructor
-    public GaugeSetup() {
+    public GaugePanel() {
         initialiseEmptyPanel();
     }
     

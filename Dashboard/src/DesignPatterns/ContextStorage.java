@@ -1,10 +1,10 @@
 package DesignPatterns;
 
 import Interfaces.SetPanel;
-import UIClassesForGauges.TrafficLightSetup;
+import UIClassesForGauges.TrafficLightPanel;
 import UIClassesForGauges.RegularGauge;
 import UIClassesForGauges.SpecialisedGauge;
-import UIClassesForGauges.GaugeSetup;
+import UIClassesForGauges.GaugePanel;
 import dashboard.PairHeads;
 import java.util.HashMap;
 
@@ -31,7 +31,7 @@ public class ContextStorage {
     // add a gauge to the gauges HashMap together with its positions in GridBagLayout
     public synchronized void addGauge(Object s, PairHeads c) {
         if (s instanceof RegularGauge) {
-            GaugeSetup gauge = (GaugeSetup) s;
+            GaugePanel gauge = (GaugePanel) s;
             gauge.getGauge().setLedVisible(false);
             gauges.put(s, c);
         } else {

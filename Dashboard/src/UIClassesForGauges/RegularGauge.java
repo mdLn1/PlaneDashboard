@@ -2,7 +2,7 @@ package UIClassesForGauges;
 
 import Interfaces.GaugeAttributes;
 
-public class RegularGauge extends GaugeSetup implements GaugeAttributes {
+public class RegularGauge extends GaugePanel implements GaugeAttributes {
 
     private String unit;
     private int limitMin;
