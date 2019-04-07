@@ -20,6 +20,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -69,6 +70,7 @@ public final class Dashboard implements FrameSetup, Runnable {
     // <editor-fold desc="simulation panel input fields">
     private JButton playSimulationButton;
     private JButton setGaugesValuesButton;
+    private JButton helpWithConversionButton;
 
     private JPanel topRightPanel;
 
@@ -157,7 +159,7 @@ public final class Dashboard implements FrameSetup, Runnable {
         mainFrame.pack();
         mainFrame.setVisible(true);
     }
-
+    
     //design main container for frame
     @Override
     public void addComponentsToMainContainer(Container container) {
@@ -566,8 +568,11 @@ public final class Dashboard implements FrameSetup, Runnable {
     public void addComponentToRightContainer(Container container) {
         playSimulationButton = Helpers.createButton("Play Simulation");
         setGaugesValuesButton = Helpers.createButton("Preset Gauges Values");
+        helpWithConversionButton = Helpers.createButton("Convert Distance");
         GridBagConstraints c = new GridBagConstraints();
         topRightPanel = new JPanel();
+        topRightPanel.setLayout(new BoxLayout(topRightPanel, BoxLayout.Y_AXIS));
+        topRightPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         playSimulationButton.addActionListener(new ActionListener() {
             @Override
@@ -580,7 +585,15 @@ public final class Dashboard implements FrameSetup, Runnable {
             }
 
         });
-
+        
+        helpWithConversionButton.addActionListener((ActionEvent e) -> {
+            ConverterHelp convHelp = new ConverterHelp();
+            convHelp.setLocationRelativeTo(null);
+            convHelp.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            convHelp.setVisible(true);
+            
+        });
+        
         setGaugesValuesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -613,6 +626,7 @@ public final class Dashboard implements FrameSetup, Runnable {
 
         topRightPanel.add(playSimulationButton);
         topRightPanel.add(setGaugesValuesButton);
+        topRightPanel.add(helpWithConversionButton);
 
         selectedGaugeLabel = Helpers.createLabel("Selected Gauge");
         selectedGaugeLabel.setPreferredSize(new Dimension(240, 40));
