@@ -1,11 +1,15 @@
 package DesignPatterns;
 
+// <editor-fold desc="components of SteelSeries">
 import eu.hansolo.steelseries.extras.TrafficLight;
 import eu.hansolo.steelseries.extras.WindDirection;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import eu.hansolo.steelseries.gauges.Radial;
 import eu.hansolo.steelseries.gauges.Radial1Square;
 import eu.hansolo.steelseries.gauges.Radial2Top;
+
+// </editor-fold>
+
 import java.util.HashMap;
 import javax.swing.JComponent;
 

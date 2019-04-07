@@ -1,7 +1,6 @@
 package DesignPatterns;
 
 import Interfaces.SetPanel;
-import UIClassesForGauges.TrafficLightPanel;
 import UIClassesForGauges.RegularGauge;
 import UIClassesForGauges.SpecialisedGauge;
 import UIClassesForGauges.GaugePanel;

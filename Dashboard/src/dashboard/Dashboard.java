@@ -534,8 +534,8 @@ public final class Dashboard implements FrameSetup, Runnable {
 
     // show error message for NumberFormatException
     public void notifyNumberConversionError(String parameter) {
-        JOptionPane.showMessageDialog(mainFrame, "Could not convert to number " + parameter
-                , "Error!", 0);
+        JOptionPane.showMessageDialog(mainFrame, "Could not convert to number " + parameter,
+                 "Error!", 0);
     }
 
     // show error message for IllegalArgumentException
@@ -633,21 +633,27 @@ public final class Dashboard implements FrameSetup, Runnable {
 
             GaugePanel gauge = (GaugePanel) context
                     .getGauge(selectedGaugeLabel.getText().trim());
-            if (gauge != null && gauge.getGauge().getMinValue() < newValue
-                    && gauge.getGauge().getMaxValue() > newValue) {
+            if (gauge != null) {
                 try {
                     newValue = Double.parseDouble(selectedGaugeValueText.getText());
                 } catch (NumberFormatException npe) {
                     notifyNumberConversionError(selectedGaugeLabel.getText().trim() + " value");
                     return;
                 }
-                UpdateGaugeThread updateThread
-                        = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
-                updateThread.start();
+                if (gauge.getGauge().getMinValue() < newValue
+                        && gauge.getGauge().getMaxValue() > newValue) {
+                    UpdateGaugeThread updateThread
+                            = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
+                    updateThread.start();
+                } else {
+                    JOptionPane.showMessageDialog(mainFrame, "Could not set the "
+                            + "given value", "Error!", 0);
+                }
+
             } else if (gauge == null) {
                 JOptionPane.showMessageDialog(mainFrame, "You have not selected any gauge,"
                         + " please click on one of the dashboard elements.",
-                         "Error!", 0);
+                        "Error!", 0);
             } else {
                 JOptionPane.showMessageDialog(mainFrame, "Could not set the "
                         + "given value", "Error!", 0);

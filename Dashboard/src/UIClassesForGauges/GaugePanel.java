@@ -3,9 +3,11 @@ package UIClassesForGauges;
 import DesignPatterns.GaugeFactory;
 import DesignPatterns.Helpers;
 import Interfaces.SetPanel;
+// <editor-fold desc="components of SteelSeries">
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import eu.hansolo.steelseries.gauges.Radial;
+// </editor-fold>
 import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.BoxLayout;

@@ -104,12 +104,13 @@ public class GaugePanelTest {
         assertEquals(unit, "");
     }
     
+    // test whether the value is the one already set
     @Test
     public void testSetGaugeUnit1() {
         String unit = "123";
         GaugePanel instance = new GaugePanel();
         instance.setGaugeUnit(unit);
-        assertEquals(unit, "123");
+        assertEquals(instance.getGauge().getUnitString(), "123");
     }
     
     // test setter SetGaugeUnit() with null string
