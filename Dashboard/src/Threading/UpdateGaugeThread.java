@@ -1,6 +1,8 @@
 package Threading;
 
+import eu.hansolo.steelseries.extras.WindDirection;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
+import eu.hansolo.steelseries.gauges.AbstractRadial;
 
 // thread which does not allow updating different dials at the same time
 // mainly used when user edits the dial value
@@ -25,6 +27,10 @@ public class UpdateGaugeThread extends Thread {
             while (x < value) {
             x += 1.0;
             gauge.setValue(x);
+            if (gauge instanceof WindDirection){
+                        WindDirection gauge1 = (WindDirection) gauge;
+                        gauge1.setLcdValue(x);
+                    }
             try {
                 Thread.sleep(70);
             } catch (Exception ex) {
@@ -36,6 +42,10 @@ public class UpdateGaugeThread extends Thread {
             while (x > value) {
             x -= 1.0;
             gauge.setValue(x);
+            if (gauge instanceof WindDirection){
+                        WindDirection gauge1 = (WindDirection) gauge;
+                        gauge1.setLcdValue(x);
+                    }
             try {
                 Thread.sleep(70);
             } catch (Exception ex) {

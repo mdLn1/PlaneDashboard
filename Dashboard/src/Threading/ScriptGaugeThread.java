@@ -1,5 +1,6 @@
 package Threading;
 
+import eu.hansolo.steelseries.extras.WindDirection;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 
 // synchronized thread that allows changing value on multiple gauges at the same time
@@ -23,6 +24,10 @@ public class ScriptGaugeThread extends Thread{
             while (x < value) {
             x += 1.0;
             gauge.setValue(x);
+            if (gauge instanceof WindDirection){
+                        WindDirection gauge1 = (WindDirection) gauge;
+                        gauge1.setLcdValue(x);
+                    }
             try {
                 Thread.sleep(50);
             } catch (Exception ex) {
@@ -34,6 +39,10 @@ public class ScriptGaugeThread extends Thread{
             while (x > value) {
             x -= 1.0;
             gauge.setValue(x);
+            if (gauge instanceof WindDirection){
+                        WindDirection gauge1 = (WindDirection) gauge;
+                        gauge1.setLcdValue(x);
+                    } 
             try {
                 Thread.sleep(50);
             } catch (Exception ex) {

@@ -14,6 +14,7 @@ import UIClassesForGauges.TrafficLightPanel;
 import UIClassesForGauges.RegularGauge;
 import UIClassesForGauges.SpecialisedGauge;
 import UIClassesForGauges.GaugePanel;
+import eu.hansolo.steelseries.extras.WindDirection;
 import eu.hansolo.steelseries.gauges.AbstractGauge;
 import javax.swing.JFrame;
 import java.awt.BorderLayout;

@@ -3,8 +3,10 @@ package UIClassesForGauges;
 import DesignPatterns.GaugeFactory;
 import DesignPatterns.Helpers;
 import Interfaces.SetPanel;
+import eu.hansolo.steelseries.extras.WindDirection;
 // <editor-fold desc="components of SteelSeries">
 import eu.hansolo.steelseries.gauges.AbstractGauge;
+import eu.hansolo.steelseries.gauges.AbstractRadial;
 import eu.hansolo.steelseries.gauges.LinearBargraph;
 import eu.hansolo.steelseries.gauges.Radial;
 // </editor-fold>
@@ -69,6 +71,7 @@ public class GaugePanel extends JPanel implements SetPanel{
         {
             gauge.setPreferredSize(new Dimension(300,300));
         }
+            
         setTitle(name);
         setGaugeUnit("unit");
         
