@@ -20,7 +20,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -654,8 +653,8 @@ public final class Dashboard implements FrameSetup, Runnable {
                     notifyNumberConversionError(selectedGaugeLabel.getText().trim() + " value");
                     return;
                 }
-                if (gauge.getGauge().getMinValue() < newValue
-                        && gauge.getGauge().getMaxValue() > newValue) {
+                if (gauge.getGauge().getMinValue() <= newValue
+                        && gauge.getGauge().getMaxValue() >= newValue) {
                     UpdateGaugeThread updateThread
                             = new UpdateGaugeThread((AbstractGauge) gauge.getGauge(), newValue);
                     updateThread.start();
